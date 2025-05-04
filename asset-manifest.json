@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/mmagdyroots/my-regex-app/static/css/main.e6c13ad2.css",
+    "main.js": "/mmagdyroots/my-regex-app/static/js/main.56c16299.js",
+    "index.html": "/mmagdyroots/my-regex-app/index.html",
+    "main.e6c13ad2.css.map": "/mmagdyroots/my-regex-app/static/css/main.e6c13ad2.css.map",
+    "main.56c16299.js.map": "/mmagdyroots/my-regex-app/static/js/main.56c16299.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.56c16299.js"
+  ]
+}
