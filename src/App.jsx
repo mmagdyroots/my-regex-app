@@ -226,8 +226,15 @@ const App = () => {
   };
 
   return (
-<div style={{ ...styles.container }} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-<button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} style={{ float: 'right' }}>
+<div
+  style={{
+    ...styles.container,
+    overflowX: 'auto',     // enable horizontal scrolling
+    direction: language === 'ar' ? 'rtl' : 'ltr', // respect text direction
+    width: '100vw',         // make sure it spans viewport width
+    boxSizing: 'border-box'
+  }}
+><button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} style={{ float: 'right' }}>
   🌐 {language === 'en' ? 'عربي' : 'English'}
       </button>
       <br />
@@ -352,7 +359,12 @@ const App = () => {
 };
 
 const styles = {
-
+  // container: {
+  //   padding: 20,
+  //   minHeight: '100vh',
+  //   overflowX: 'auto',
+  //   boxSizing: 'border-box',
+  // },
   dividerContainer: {
     display: 'flex',
     alignItems: 'center',
