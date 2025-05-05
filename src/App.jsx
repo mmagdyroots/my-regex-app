@@ -68,6 +68,11 @@ const App = () => {
   const [labelHintsText, setLabelHintsText] = useState('');
   const [isRequired, setIsRequired] = useState(false);
 
+  const [isInputMaskEnabled, setIsInputMaskEnabled] = useState(false);
+  const [inputMaskPattern, setInputMaskPattern] = useState('');
+
+  const [copyPasteGuard, setCopyPasteGuard] = useState(true);
+
 
   // const getCustomConstraints = () => {
   //   return customConstraintsText
@@ -204,6 +209,42 @@ const App = () => {
     return hints.length ? hints.join('\n') : '';
   };
 
+  const applyInputMask = (value, mask) => {
+  if (!mask) return value;
+  let result = '';
+  let valIndex = 0;
+
+  for (let i = 0; i < mask.length && valIndex < value.length; i++) {
+    const maskChar = mask[i];
+    const inputChar = value[valIndex];
+
+    if (maskChar === 'A') {
+      if (/[A-Za-z]/.test(inputChar)) {
+        result += inputChar;
+        valIndex++;
+      } else {
+        break;
+      }
+    } else if (maskChar === '9') {
+      if (/\d/.test(inputChar)) {
+        result += inputChar;
+        valIndex++;
+      } else {
+        break;
+      }
+    } else if (maskChar === '*') {
+      // Accept any character
+      result += inputChar;
+      valIndex++;
+    } else {
+      result += maskChar;
+      if (inputChar === maskChar) valIndex++;
+    }
+  }
+
+  return result;
+};
+
   const validateInput = (val, pattern = regexObj) => {
     if (!val.trim()) {
       if (isRequired) {
@@ -274,6 +315,40 @@ const App = () => {
       {t.fieldRequired}
     </label>
       <br></br>
+      <label>
+  <input
+    type="checkbox"
+    checked={isInputMaskEnabled}
+    onChange={(e) => setIsInputMaskEnabled(e.target.checked)}
+    style={{ marginRight: 8 }}
+  />
+  Enable Input Mask
+</label>
+
+<br />
+{isInputMaskEnabled && (
+  <>
+    <label>Input Mask Pattern</label>
+    <input
+      type="text"
+      value={inputMaskPattern}
+      onChange={(e) => setInputMaskPattern(e.target.value)}
+      style={styles.input}
+      placeholder="e.g. AAA-9999"
+    />
+  </>
+)}
+<label>
+  <input
+    type="checkbox"
+    checked={copyPasteGuard}
+    onChange={(e) => setCopyPasteGuard(e.target.checked)}
+    style={{ marginRight: 8 }}
+  />
+  {language === 'ar' ? 'منع النسخ / اللصق' : 'Copy/Paste Guard'}
+</label>
+
+<br />
       <label>{t.inputPlaceholder}</label>
       <input
         type="text"
@@ -288,12 +363,14 @@ const App = () => {
   value={customConstraintsText}
   onChange={(e) => setCustomConstraintsText(e.target.value)}
   rows={4}
+  tabIndex={3}
   style={styles.textarea}
   placeholder={t.customConstraintPlaceholder}
 />
 
 <label>{t.labelInfoLabel}</label>
 <textarea
+tabIndex={2}
   value={labelHintsText}
   onChange={(e) => setLabelHintsText(e.target.value)}
   rows={4}
@@ -324,22 +401,48 @@ const App = () => {
       </div>
 
       <div style={{ position: 'relative', width: '100%' }}>
-        <input
-          type="text"
-          placeholder={myPlaceholder}
-          value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            validateInput(e.target.value);
-          }}
-          style={{
-            ...styles.input,
-            width: '100%',
-            paddingRight: '30px',
-            boxSizing: 'border-box',
-            borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
-          }}
-        />
+      <input
+      tabIndex={1}
+    type="text"
+    placeholder={myPlaceholder}
+    value={inputValue}
+    onChange={(e) => {
+      const val = e.target.value;
+      const masked = isInputMaskEnabled ? applyInputMask(val, inputMaskPattern) : val;
+      setInputValue(masked);
+      validateInput(masked);
+    }}
+    onPaste={copyPasteGuard ? (e) => e.preventDefault() : undefined}
+    onCopy={copyPasteGuard ? (e) => e.preventDefault() : undefined}
+    style={{
+      ...styles.input,
+      width: '100%',
+      paddingRight: language === 'ar' ? '30px' : '60px',
+      paddingLeft: language === 'ar' ? '60px' : '30px',
+      boxSizing: 'border-box',
+      borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
+    }}
+  />
+  {!copyPasteGuard && (
+    <button
+      onClick={async () => {
+        const clip = await navigator.clipboard.readText();
+        const masked = isInputMaskEnabled ? applyInputMask(clip, inputMaskPattern) : clip;
+        setInputValue(masked);
+        validateInput(masked);
+      }}
+      style={{
+        marginLeft: 8,
+        marginTop: -15,
+        position: 'absolute',
+        [language === 'ar' ? 'left' : 'right']: 10,
+        padding: '4px 8px',
+        cursor: 'pointer'
+      }}
+    >
+      {language === 'ar' ? 'لصق' : 'Paste'}
+    </button>
+  )}
 <InfoTooltip
   tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
 />
@@ -353,7 +456,7 @@ const App = () => {
         </div>
       )}
 
-      {isValid && <div style={styles.successBox}>{t.validInput}</div>}
+      {isValid && <div style={styles.successBox}>{t.success}</div>}
     </div>
   );
 };
