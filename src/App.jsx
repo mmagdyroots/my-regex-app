@@ -1,6 +1,60 @@
 import React, { useState, useEffect } from 'react';
+import InfoTooltip from './components/InfoTooltip/InfoTooltip.jsx';
+
+const translations = {
+  en: {
+    creatorTitle: "🎛️ Creator",
+    previewTitle: "🧪 Preview",
+    regexPattern: "Regex Pattern:",
+    inputLabel: "Input Label Text:",
+    iconLabel: "Icon Before Label:",
+    fieldRequired: "Field is Required",
+    inputPlaceholder: "Input Placeholder Text:",
+    inputPlaceholderHolder: "Input Placeholder",
+    constraintHints: "Custom Constraint Hints (one per line):",
+    labelHints: "Label Info Hints (one per line):",
+    fieldRequiredError: "This field is required.",
+    placeholderExample: "Enter placeholder",
+    regexError: "❌ Invalid regex pattern syntax.",
+    success: "✅ Input is valid!",
+    inputErrorPrefix: "",
+    enterLabel: "Enter label text",
+    enterIcon: "e.g. ✉️",
+    enterRegex: "Enter regex pattern",
+    customConstraintLabel: 'Custom Constraint Hints (one per line):',
+    customConstraintPlaceholder: 'e.g. must be lowercase\nmust include year',
+    labelInfoLabel: 'Label Info Hints (one per line):',
+    labelInfoPlaceholder: 'e.g. This is my Test Hint\nAnother Hint',
+  },
+  ar: {
+    creatorTitle: "🎛️ المُنشئ",
+    previewTitle: "🧪 المعاينة",
+    regexPattern: "نمط التعبير النمطي:",
+    inputLabel: "نص تسمية الإدخال:",
+    iconLabel: "الأيقونة قبل التسمية:",
+    fieldRequired: "الحقل مطلوب",
+    inputPlaceholder: "نص العنصر النائب للإدخال:",
+    inputPlaceholderHolder: "نص العنصر النائب",
+    constraintHints: "تلميحات القيود المخصصة (سطر لكل تلميح):",
+    labelHints: "تلميحات معلومات التسمية (سطر لكل تلميح):",
+    fieldRequiredError: "هذا الحقل مطلوب.",
+    placeholderExample: "أدخل النص التوضيحي",
+    regexError: "❌ صيغة النمط غير صالحة.",
+    success: "✅ الإدخال صحيح!",
+    inputErrorPrefix: "",
+    enterLabel: "أدخل نص التسمية",
+    enterIcon: "مثال: ✉️",
+    enterRegex: "أدخل نمط regex",
+    customConstraintLabel: 'تلميحات القيود المخصصة (سطر لكل تلميح):',
+    customConstraintPlaceholder: 'مثال: يجب أن يكون بأحرف صغيرة\nيجب أن يحتوي على السنة',
+    labelInfoLabel: 'تلميحات توضيحية لاسم الحقل (سطر لكل تلميح):',
+    labelInfoPlaceholder: 'مثال: هذا تلميح توضيحي\nتلميح آخر',
+  },
+};
 
 const App = () => {
+  const [language, setLanguage] = useState('en');
+  const t = translations[language];
   const [regexInput, setRegexInput] = useState('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
   const [inputValue, setInputValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,7 +78,7 @@ const App = () => {
   // };
   const getCustomConstraints = () => {
     const list = [];
-    if (isRequired) list.push('⚠️ This field is required.');
+    if (isRequired) list.push('⚠️ '+ t.fieldRequiredError);
     if (customConstraintsText.trim()) {
       customConstraintsText
         .split('\n')
@@ -48,40 +102,52 @@ const App = () => {
       validateInput(inputValue, r);
     } catch (err) {
       setIsValid(false);
-      setErrorMessage('❌ Invalid regex pattern syntax.');
+      setErrorMessage(t.invalidRegex);
     }
   }, [regexInput]);
 
   const parseConstraints = (pattern) => {
     const readable = [];
-
+  
     try {
       const charClassMatches = [...pattern.matchAll(/\[([^\]]+)\]/g)];
       charClassMatches.forEach((match) => {
         const chars = match[1];
-        if (/a-z/i.test(chars)) readable.push('✅ Must contain letters (a–z, A–Z)');
-        if (/0-9/.test(chars)) readable.push('✅ Must include digits (0–9)');
-        if (/[!@#$%^&*._%+-]/.test(chars))
-          readable.push(`✅ May include special characters (${chars.replace(/[a-z0-9]/gi, '').split('').join(' ')})`);
+        if (/a-z/i.test(chars)) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على أحرف (a–z، A–Z)' : '✅ Must contain letters (a–z, A–Z)');
+        if (/0-9/.test(chars)) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على أرقام (0–9)' : '✅ Must include digits (0–9)');
+        if (/[!@#$%^&*._%+-]/.test(chars)) {
+          const specials = chars.replace(/[a-z0-9]/gi, '').split('').join(' ');
+          readable.push(language === 'ar'
+            ? `✅ يمكن أن يحتوي على رموز خاصة (${specials})`
+            : `✅ May include special characters (${specials})`
+          );
+        }
       });
-
+  
       const quantifierMatches = [...pattern.matchAll(/\{(\d+),?(\d+)?\}/g)];
       quantifierMatches.forEach((match) => {
         const [, min, max] = match;
-        if (min && max) readable.push(`✅ Repeat previous element between ${min} and ${max} times`);
-        else if (min) readable.push(`✅ Repeat previous element at least ${min} times`);
+        if (min && max) readable.push(language === 'ar'
+          ? `✅ كرر العنصر السابق من ${min} إلى ${max} مرة`
+          : `✅ Repeat previous element between ${min} and ${max} times`
+        );
+        else if (min) readable.push(language === 'ar'
+          ? `✅ كرر العنصر السابق على الأقل ${min} مرات`
+          : `✅ Repeat previous element at least ${min} times`
+        );
       });
-
-      if (pattern.includes('^')) readable.push('✅ Must start from the beginning');
-      if (pattern.includes('$')) readable.push('✅ Must match to the end');
-      if (pattern.includes('@')) readable.push('✅ Must contain "@" symbol');
-      if (pattern.includes('\\.')) readable.push('✅ Must include dot "."');
-
-      if (readable.length === 0) readable.push('ℹ️ No human-readable constraints could be parsed.');
+  
+      if (pattern.includes('^')) readable.push(language === 'ar' ? '✅ يجب أن يبدأ من البداية' : '✅ Must start from the beginning');
+      if (pattern.includes('$')) readable.push(language === 'ar' ? '✅ يجب أن يتطابق حتى النهاية' : '✅ Must match to the end');
+      if (pattern.includes('@')) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على الرمز "@"' : '✅ Must contain "@" symbol');
+      if (pattern.includes('\\.')) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على النقطة "."' : '✅ Must include dot "."');
+  
+      if (readable.length === 0)
+        readable.push(language === 'ar' ? 'ℹ️ لا يمكن تحويل النمط إلى قيود مفهومة.' : 'ℹ️ No human-readable constraints could be parsed.');
     } catch {
-      readable.push('⚠️ Could not parse regex constraints.');
+      readable.push(language === 'ar' ? '⚠️ لا يمكن تحليل قيود التعبير النمطي.' : '⚠️ Could not parse regex constraints.');
     }
-
+  
     return readable;
   };
 
@@ -89,28 +155,52 @@ const App = () => {
     let hints = [];
 
     const patternStr = regex.toString();
-
+  
     if (/\[.*a-z.*\]/i.test(patternStr) && !/[a-zA-Z]/.test(value))
-      hints.push('Should contain at least one letter (a–z, A–Z).');
-
+      hints.push(language === 'ar'
+        ? 'يجب أن يحتوي على حرف واحد على الأقل (a–z، A–Z).'
+        : 'Should contain at least one letter (a–z, A–Z).'
+      );
+  
     if (/\[.*0-9.*\]/.test(patternStr) && !/[0-9]/.test(value))
-      hints.push('Should include at least one digit (0–9).');
-
+      hints.push(language === 'ar'
+        ? 'يجب أن يحتوي على رقم واحد على الأقل (0–9).'
+        : 'Should include at least one digit (0–9).'
+      );
+  
     if (/\[.*[!@#$%^&*._%+-]+.*\]/.test(patternStr) && !/[!@#$%^&*._%+-]/.test(value))
-      hints.push('Should include one of the special characters used.');
-
-    if (patternStr.includes('@') && !/@/.test(value)) hints.push('Missing "@" symbol.');
-    if (patternStr.includes('\\.') && !/\./.test(value)) hints.push('Missing dot "."');
-
+      hints.push(language === 'ar'
+        ? 'يجب أن يحتوي على أحد الرموز الخاصة المستخدمة.'
+        : 'Should include one of the special characters used.'
+      );
+  
+    if (patternStr.includes('@') && !/@/.test(value))
+      hints.push(language === 'ar' ? 'الرمز "@" مفقود.' : 'Missing "@" symbol.');
+  
+    if (patternStr.includes('\\.') && !/\./.test(value))
+      hints.push(language === 'ar' ? 'النقطة "." مفقودة.' : 'Missing dot "."');
+  
     const quantMatch = patternStr.match(/\{(\d+),?(\d+)?\}/);
     if (quantMatch) {
       const [, min, max] = quantMatch;
-      if (min && value.length < parseInt(min)) hints.push(`Input must be at least ${min} characters.`);
-      if (max && value.length > parseInt(max)) hints.push(`Input must not exceed ${max} characters.`);
+      if (min && value.length < parseInt(min))
+        hints.push(language === 'ar'
+          ? `يجب أن يكون الإدخال على الأقل ${min} حرفًا.`
+          : `Input must be at least ${min} characters.`
+        );
+      if (max && value.length > parseInt(max))
+        hints.push(language === 'ar'
+          ? `يجب ألا يتجاوز الإدخال ${max} حرفًا.`
+          : `Input must not exceed ${max} characters.`
+        );
     }
-
-    if (!regex.test(value)) hints.push('Input does not match the full pattern.');
-
+  
+    if (!regex.test(value))
+      hints.push(language === 'ar'
+        ? 'الإدخال لا يتطابق مع النمط الكامل.'
+        : 'Input does not match the full pattern.'
+      );
+  
     return hints.length ? hints.join('\n') : '';
   };
 
@@ -118,7 +208,7 @@ const App = () => {
     if (!val.trim()) {
       if (isRequired) {
         setIsValid(false);
-        setErrorMessage(`:This field is required.`);
+        setErrorMessage(t.requiredField);
       } else {
         setIsValid(null);
         setErrorMessage('');
@@ -136,33 +226,36 @@ const App = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>🎛️ Creator</h2>
-
-      <label>Regex Pattern:</label>
+<div style={{ ...styles.container }} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+<button onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')} style={{ float: 'right' }}>
+  🌐 {language === 'en' ? 'عربي' : 'English'}
+      </button>
+      <br />
+      <h2>{t.creatorTitle}</h2>
+      <label>{t.regexPattern}</label>
       <input
         type="text"
         value={regexInput}
         onChange={(e) => setRegexInput(e.target.value)}
         style={styles.input}
-        placeholder="Enter regex pattern"
+        placeholder={t.enterRegex}
       />
 
-      <label>Input Label Text:</label>
+      <label>{t.inputLabel}</label>
       <input
         type="text"
         value={myLabel}
         onChange={(e) => setMyLabel(e.target.value)}
         style={styles.input}
-        placeholder="Enter label text"
+        placeholder={t.enterLabelText}
       />
-      <label>Icon Before Label:</label>
+      <label>{t.iconLabel}</label>
       <input
         type="text"
         value={myIcon}
         onChange={(e) => setMyIcon(e.target.value)}
         style={styles.input}
-        placeholder="e.g. ✉️"
+        placeholder={t.iconExample}
       />
       <label>
       <input
@@ -171,50 +264,56 @@ const App = () => {
         onChange={(e) => setIsRequired(e.target.checked)}
         style={{ marginRight: 8 }}
       />
-      Field is Required
+      {t.fieldRequired}
     </label>
       <br></br>
-      <label>Input Placeholder Text:</label>
+      <label>{t.inputPlaceholder}</label>
       <input
         type="text"
         value={myPlaceholder}
         onChange={(e) => setMyPlaceholder(e.target.value)}
         style={styles.input}
-        placeholder="Enter placeholder"
+        placeholder={t.inputPlaceholderHolder}
       />
 
-      <label>Custom Constraint Hints (one per line):</label>
-      <textarea
-        value={customConstraintsText}
-        onChange={(e) => setCustomConstraintsText(e.target.value)}
-        rows={4}
-        style={styles.textarea}
-        placeholder="e.g. must be lowercase&#10;must include year"
-      />
+<label>{t.customConstraintLabel}</label>
+<textarea
+  value={customConstraintsText}
+  onChange={(e) => setCustomConstraintsText(e.target.value)}
+  rows={4}
+  style={styles.textarea}
+  placeholder={t.customConstraintPlaceholder}
+/>
 
-      <label>Label Info Hints (one per line):</label>
-      <textarea
-        value={labelHintsText}
-        onChange={(e) => setLabelHintsText(e.target.value)}
-        rows={4}
-        style={styles.textarea}
-        placeholder="e.g. This is my Test Hint&#10;Another Hint"
-      />
+<label>{t.labelInfoLabel}</label>
+<textarea
+  value={labelHintsText}
+  onChange={(e) => setLabelHintsText(e.target.value)}
+  rows={4}
+  style={styles.textarea}
+  placeholder={t.labelInfoPlaceholder}
+/>
 
 <div style={styles.dividerContainer}>
   <div style={styles.dividerLine}></div>
   <span style={styles.dividerText}>✦</span>
   <div style={styles.dividerLine}></div>
 </div>
-      <h2>🧪 Preview</h2>
+    <h2>{t.previewTitle}</h2>
 
       <div style={styles.constraintHeader}>
-      <span style={{ fontSize: '1.2em', marginRight: 6 }}>{myIcon}</span>
+        <div>
+        <span style={{ fontSize: '1.2em', marginRight: 6 }}>{myIcon}</span>
       <label style={{ marginRight: 8 }}>{myLabel}</label>
-        <span style={styles.infoIcon} title={getLabelHints().join('\n')}>ℹ️</span>
+
         <label style={{ marginRight: 8 }}>
           {isRequired ? '*' : ''}:
         </label>
+        </div>
+        <div  style={{marginInlineStart:'35px'}}>
+        <InfoTooltip tooltipText={getLabelHints().join('\n')} />
+        </div>
+
       </div>
 
       <div style={{ position: 'relative', width: '100%' }}>
@@ -234,20 +333,9 @@ const App = () => {
             borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
           }}
         />
-        <span
-          style={{
-            position: 'absolute',
-            right: '10px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            cursor: 'pointer',
-            color: '#999',
-            fontSize: '16px',
-          }}
-          title={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
-        >
-          ℹ️
-        </span>
+<InfoTooltip
+  tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
+/>
       </div>
 
       {errorMessage && (
@@ -258,7 +346,7 @@ const App = () => {
         </div>
       )}
 
-      {isValid && <div style={styles.successBox}>✅ Input is valid!</div>}
+      {isValid && <div style={styles.successBox}>{t.validInput}</div>}
     </div>
   );
 };
