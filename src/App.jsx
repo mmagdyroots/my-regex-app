@@ -25,6 +25,27 @@ const translations = {
     customConstraintPlaceholder: 'e.g. must be lowercase\nmust include year',
     labelInfoLabel: 'Label Info Hints (one per line):',
     labelInfoPlaceholder: 'e.g. This is my Test Hint\nAnother Hint',
+    hint1: '✅ Must contain letters (a–z, A–Z)',
+    hint2: '✅ Must include digits (0–9)',
+    hint3: (specials) => `✅ May include special characters (${specials})`,
+    hint4: (min,max) =>`✅ Repeat previous element between ${min} and ${max} times`,
+    hint5: (min) =>`✅ Repeat previous element at least ${min} times`,
+    hint6: '✅ Must start from the beginning',
+    hint7: '✅ Must match to the end',
+    hint8: '✅ Must contain "@" symbol',
+    hint9: '✅ Must include dot "."',
+    hint10: 'ℹ️ No human-readable constraints could be parsed.',
+    hint11: '⚠️ Could not parse regex constraints.',
+    hint12: 'Should contain at least one letter (a–z, A–Z).',
+    hint13: 'Should include at least one digit (0–9).',
+    hint14: 'Should include one of the special characters used.',
+    hint15: 'Missing "@" symbol.',
+    hint16: 'Missing dot "."',
+    hint17: (min) =>`Input must be at least ${min} characters.`,
+    hint18: (max) =>`Input must not exceed ${max} characters.`,
+    hint19: 'Input does not match the full pattern.',
+
+
   },
   ar: {
     creatorTitle: "🎛️ المُنشئ",
@@ -49,12 +70,32 @@ const translations = {
     customConstraintPlaceholder: 'مثال: يجب أن يكون بأحرف صغيرة\nيجب أن يحتوي على السنة',
     labelInfoLabel: 'تلميحات توضيحية لاسم الحقل (سطر لكل تلميح):',
     labelInfoPlaceholder: 'مثال: هذا تلميح توضيحي\nتلميح آخر',
+    hint1: '✅ يجب أن يحتوي على أحرف (a–z، A–Z)',
+    hint2: '✅ يجب أن يحتوي على أرقام (0–9)',
+    hint3: (specials) => `✅ يمكن أن يحتوي على رموز خاصة (${specials})`,
+    hint4: (min,max) =>`✅ كرر العنصر السابق من ${min} إلى ${max} مرة`,
+    hint5: (min) =>`✅ كرر العنصر السابق على الأقل ${min} مرات`,
+    hint6: '✅ يجب أن يبدأ من البداية',
+    hint7: '✅ يجب أن يتطابق حتى النهاية',
+    hint8: '✅ يجب أن يحتوي على الرمز "@"',
+    hint9: '✅ يجب أن يحتوي على النقطة "."',
+    hint10: 'ℹ️ لا يمكن تحويل النمط إلى قيود مفهومة.',
+    hint11: '⚠️ لا يمكن تحليل قيود التعبير النمطي.',
+    hint12: 'يجب أن يحتوي على حرف واحد على الأقل (a–z، A–Z).',
+    hint13: 'يجب أن يحتوي على رقم واحد على الأقل (0–9).',
+    hint14: 'يجب أن يحتوي على أحد الرموز الخاصة المستخدمة.',
+    hint15: 'الرمز "@" مفقود.',
+    hint16: 'النقطة "." مفقودة.',
+    hint17: (min) =>`يجب أن يكون الإدخال على الأقل ${min} حرفًا.`,
+    hint18: (max) =>`يجب ألا يتجاوز الإدخال ${max} حرفًا.`,
+    hint19: 'الإدخال لا يتطابق مع النمط الكامل.',
   },
 };
 
+
 const App = () => {
   const [language, setLanguage] = useState('en');
-  const t = translations[language];
+  let t = translations[language];
   const [regexInput, setRegexInput] = useState('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
   const [inputValue, setInputValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -71,7 +112,21 @@ const App = () => {
   const [isInputMaskEnabled, setIsInputMaskEnabled] = useState(false);
   const [inputMaskPattern, setInputMaskPattern] = useState('');
 
-  const [copyPasteGuard, setCopyPasteGuard] = useState(true);
+  const [pasteGuard, setPasteGuard] = useState(true);
+  const [showPasteButton, setShowPasteButton] = useState(false);
+
+
+
+  const [userLanguages, setUserLanguages] = useState(['en', 'ar']); // default
+const [newLang, setNewLang] = useState('');
+const [selectedPreviewLang, setSelectedPreviewLang] = useState('en');
+
+const [fieldData, setFieldData] = useState({
+  labelText: {},
+  placeholder: {},
+  constraintHint: {},
+  infoHint: {}
+});
 
 
   // const getCustomConstraints = () => {
@@ -83,21 +138,31 @@ const App = () => {
   // };
   const getCustomConstraints = () => {
     const list = [];
-    if (isRequired) list.push('⚠️ '+ t.fieldRequiredError);
-    if (customConstraintsText.trim()) {
-      customConstraintsText
+
+    if (isRequired) list.push('⚠️ '+ (translations[selectedPreviewLang]?.fieldRequiredError || translations['en'].fieldRequiredError));
+    if (fieldData.constraintHint[selectedPreviewLang]?.trim()) {
+      let temp = fieldData.constraintHint[selectedPreviewLang].trim()
+      if(temp){
+
+      
+      fieldData.constraintHint[selectedPreviewLang]
         .split('\n')
         .filter((line) => line.trim() !== '')
         .forEach((line) => list.push(line.trim()));
+      }
     }
     return list;
   };
   const getLabelHints = () => {
-    return labelHintsText
+    let temp = fieldData.infoHint[selectedPreviewLang]
+    if(temp){
+      return fieldData.infoHint[selectedPreviewLang]
       .split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0)
       .map(line => `- ${line}`);
+    }
+
   };
 
   useEffect(() => {
@@ -118,39 +183,30 @@ const App = () => {
       const charClassMatches = [...pattern.matchAll(/\[([^\]]+)\]/g)];
       charClassMatches.forEach((match) => {
         const chars = match[1];
-        if (/a-z/i.test(chars)) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على أحرف (a–z، A–Z)' : '✅ Must contain letters (a–z, A–Z)');
-        if (/0-9/.test(chars)) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على أرقام (0–9)' : '✅ Must include digits (0–9)');
+        if (/a-z/i.test(chars)) readable.push(translations[selectedPreviewLang]?.hint1 || translations['en'].hint1);
+        if (/0-9/.test(chars)) readable.push(translations[selectedPreviewLang]?.hint2|| translations['en'].hint2);
         if (/[!@#$%^&*._%+-]/.test(chars)) {
-          const specials = chars.replace(/[a-z0-9]/gi, '').split('').join(' ');
-          readable.push(language === 'ar'
-            ? `✅ يمكن أن يحتوي على رموز خاصة (${specials})`
-            : `✅ May include special characters (${specials})`
-          );
+          let specials = chars.replace(/[a-z0-9]/gi, '').split('').join(' ');
+          readable.push(translations[selectedPreviewLang]?.hint3(specials)|| translations['en'].hint3(specials));
         }
       });
   
       const quantifierMatches = [...pattern.matchAll(/\{(\d+),?(\d+)?\}/g)];
       quantifierMatches.forEach((match) => {
-        const [, min, max] = match;
-        if (min && max) readable.push(language === 'ar'
-          ? `✅ كرر العنصر السابق من ${min} إلى ${max} مرة`
-          : `✅ Repeat previous element between ${min} and ${max} times`
-        );
-        else if (min) readable.push(language === 'ar'
-          ? `✅ كرر العنصر السابق على الأقل ${min} مرات`
-          : `✅ Repeat previous element at least ${min} times`
-        );
+        let [, min, max] = match;
+        if (min && max) readable.push(translations[selectedPreviewLang]?.hint4(min,max) || translations['en'].hint4(min,max));
+        else if (min) readable.push(translations[selectedPreviewLang]?.hint5(min) || translations['en'].hint5(min));
       });
   
-      if (pattern.includes('^')) readable.push(language === 'ar' ? '✅ يجب أن يبدأ من البداية' : '✅ Must start from the beginning');
-      if (pattern.includes('$')) readable.push(language === 'ar' ? '✅ يجب أن يتطابق حتى النهاية' : '✅ Must match to the end');
-      if (pattern.includes('@')) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على الرمز "@"' : '✅ Must contain "@" symbol');
-      if (pattern.includes('\\.')) readable.push(language === 'ar' ? '✅ يجب أن يحتوي على النقطة "."' : '✅ Must include dot "."');
+      if (pattern.includes('^')) readable.push( translations[selectedPreviewLang]?.hint6 || translations['en'].hint6);
+      if (pattern.includes('$')) readable.push(translations[selectedPreviewLang]?.hint7 || translations['en'].hint7);
+      if (pattern.includes('@')) readable.push(translations[selectedPreviewLang]?.hint8 || translations['en'].hint8);
+      if (pattern.includes('\\.')) readable.push(translations[selectedPreviewLang]?.hint9 || translations['en'].hint9);
   
       if (readable.length === 0)
-        readable.push(language === 'ar' ? 'ℹ️ لا يمكن تحويل النمط إلى قيود مفهومة.' : 'ℹ️ No human-readable constraints could be parsed.');
+        readable.push(translations[selectedPreviewLang]?.hint10 || translations['en'].hint10);
     } catch {
-      readable.push(language === 'ar' ? '⚠️ لا يمكن تحليل قيود التعبير النمطي.' : '⚠️ Could not parse regex constraints.');
+      readable.push(translations[selectedPreviewLang]?.hint11 || translations['en'].hint11);
     }
   
     return readable;
@@ -162,52 +218,56 @@ const App = () => {
     const patternStr = regex.toString();
   
     if (/\[.*a-z.*\]/i.test(patternStr) && !/[a-zA-Z]/.test(value))
-      hints.push(language === 'ar'
-        ? 'يجب أن يحتوي على حرف واحد على الأقل (a–z، A–Z).'
-        : 'Should contain at least one letter (a–z, A–Z).'
-      );
+      hints.push(translations[selectedPreviewLang]?.hint12 || translations['en'].hint12);
   
     if (/\[.*0-9.*\]/.test(patternStr) && !/[0-9]/.test(value))
-      hints.push(language === 'ar'
-        ? 'يجب أن يحتوي على رقم واحد على الأقل (0–9).'
-        : 'Should include at least one digit (0–9).'
-      );
+      hints.push(translations[selectedPreviewLang]?.hint13 || translations['en'].hint13);
   
     if (/\[.*[!@#$%^&*._%+-]+.*\]/.test(patternStr) && !/[!@#$%^&*._%+-]/.test(value))
-      hints.push(language === 'ar'
-        ? 'يجب أن يحتوي على أحد الرموز الخاصة المستخدمة.'
-        : 'Should include one of the special characters used.'
-      );
+      hints.push(translations[selectedPreviewLang]?.hint14 || translations['en'].hint14);
   
     if (patternStr.includes('@') && !/@/.test(value))
-      hints.push(language === 'ar' ? 'الرمز "@" مفقود.' : 'Missing "@" symbol.');
+      hints.push(translations[selectedPreviewLang]?.hint15 || translations['en'].hint15);
   
     if (patternStr.includes('\\.') && !/\./.test(value))
-      hints.push(language === 'ar' ? 'النقطة "." مفقودة.' : 'Missing dot "."');
+      hints.push(translations[selectedPreviewLang]?.hint16 || translations['en'].hint16);
   
     const quantMatch = patternStr.match(/\{(\d+),?(\d+)?\}/);
     if (quantMatch) {
       const [, min, max] = quantMatch;
       if (min && value.length < parseInt(min))
-        hints.push(language === 'ar'
-          ? `يجب أن يكون الإدخال على الأقل ${min} حرفًا.`
-          : `Input must be at least ${min} characters.`
-        );
+        hints.push(translations[selectedPreviewLang]?.hint17(min) || translations['en'].hint17(min));
       if (max && value.length > parseInt(max))
-        hints.push(language === 'ar'
-          ? `يجب ألا يتجاوز الإدخال ${max} حرفًا.`
-          : `Input must not exceed ${max} characters.`
-        );
+        hints.push(translations[selectedPreviewLang]?.hint18(max) || translations['en'].hint18(max));
     }
   
     if (!regex.test(value))
-      hints.push(language === 'ar'
-        ? 'الإدخال لا يتطابق مع النمط الكامل.'
-        : 'Input does not match the full pattern.'
-      );
+      hints.push(translations[selectedPreviewLang]?.hint19 || translations['en'].hint19);
   
     return hints.length ? hints.join('\n') : '';
   };
+  const handleJsonInput = (field, value) => {
+    try {
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'object' && parsed !== null) {
+        setFieldData(prev => ({ ...prev, [field]: parsed }));
+      }
+    } catch (err) {
+      console.error('Invalid JSON:', err.message);
+    }
+  };
+
+  const getAllLanguages = () => {
+    const all = new Set([
+      ...Object.keys(fieldData.labelText),
+      ...Object.keys(fieldData.placeholder),
+      ...Object.keys(fieldData.constraintHint),
+      ...Object.keys(fieldData.infoHint),
+    ]);
+    return Array.from(all);
+  };
+
+  const languages = getAllLanguages();
 
   const applyInputMask = (value, mask) => {
   if (!mask) return value;
@@ -288,15 +348,87 @@ const App = () => {
         style={styles.input}
         placeholder={t.enterRegex}
       />
+<h3>Add or Remove Languages</h3>
+<input
+  type="text"
+  placeholder="e.g. fr, de"
+  value={newLang}
+  onChange={(e) => setNewLang(e.target.value)}
+  style={{
+    padding: '8px 12px',
+    border: '1px solid #ccc',
+    borderRadius: '6px',
+    fontSize: '14px',
+    width: '150px'
+  }}
+/>
+<button
+style={{
+  margin: '0px 5px',
+  padding: '8px 14px',
+  backgroundColor: '#4CAF50',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  fontSize: '14px'
+}}
+onClick={() => {
+  const trimmed = newLang.trim();
+  if (trimmed && !userLanguages.includes(trimmed)) {
+    setUserLanguages([...userLanguages, trimmed]);
+    // setLocalizedFields(prev => ({
+    //   ...prev,
+    //   [trimmed]: { label: '', placeholder: '', constraints: '', labelHints: '' }
+    // }));
+    setNewLang('');
+  }
+}}>Add Language</button>
 
-      <label>{t.inputLabel}</label>
+<button
+style={{
+  padding: '8px 14px',
+  backgroundColor: '#f44336',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  fontSize: '14px'
+}}
+onClick={() => {
+  if (userLanguages.includes(newLang)) {
+    setUserLanguages(userLanguages.filter(lang => lang !== newLang));
+    // setLocalizedFields(prev => {
+    //   const copy = { ...prev };
+    //   delete copy[newLang];
+    //   return copy;
+    // });
+    setNewLang('');
+  }
+}}>Remove Language</button>
+<br />
+<br />
+      {/* <label>{t.inputLabel}</label>
       <input
         type="text"
-        value={myLabel}
-        onChange={(e) => setMyLabel(e.target.value)}
+        value={localizedFields[language]?.label || ''}
         style={styles.input}
-        placeholder={t.enterLabelText}
-      />
+
+        onChange={(e) => {
+          const val = e.target.value;
+          setLocalizedFields(prev => ({
+            ...prev,
+            [language]: { ...prev[language], label: val }
+          }));
+          setMyLabel(val);
+        }}
+        placeholder={t.enterLabel}
+      /> */}
+  <label>Label Text JSON</label>
+  <textarea     tabIndex={2}
+  rows={4}
+  style={styles.textarea} onChange={(e) => handleJsonInput('labelText', e.target.value)} />
+
       <label>{t.iconLabel}</label>
       <input
         type="text"
@@ -341,42 +473,114 @@ const App = () => {
 <label>
   <input
     type="checkbox"
-    checked={copyPasteGuard}
-    onChange={(e) => setCopyPasteGuard(e.target.checked)}
+    checked={pasteGuard}
+    onChange={(e) => setPasteGuard(e.target.checked)}
     style={{ marginRight: 8 }}
   />
-  {language === 'ar' ? 'منع النسخ / اللصق' : 'Copy/Paste Guard'}
+  {language === 'ar' ? 'منع اللصق' : 'Paste Guard'}
+</label>
+<label>
+  <input
+    type="checkbox"
+    checked={showPasteButton}
+    onChange={(e) => setShowPasteButton(e.target.checked)}
+    style={{ marginRight: 8 }}
+  />
+  {language === 'ar' ? 'ظهور ضغط اللصق' : 'Show Paste Button'}
 </label>
 
 <br />
-      <label>{t.inputPlaceholder}</label>
+      {/* <label>{t.inputPlaceholder}</label>
       <input
         type="text"
-        value={myPlaceholder}
-        onChange={(e) => setMyPlaceholder(e.target.value)}
+        value={localizedFields[language]?.placeholder || ''}
         style={styles.input}
+        onChange={(e) => {
+          const val = e.target.value;
+          setLocalizedFields(prev => ({
+            ...prev,
+            [language]: { ...prev[language], placeholder: val }
+          }));
+          setMyPlaceholder(val);
+        }}
         placeholder={t.inputPlaceholderHolder}
-      />
+      /> */}
 
-<label>{t.customConstraintLabel}</label>
+<label>Placeholder JSON</label>
+  <textarea     tabIndex={2}
+  rows={4}
+  style={styles.textarea} onChange={(e) => handleJsonInput('placeholder', e.target.value)} />
+
+
+
+
+
+
+
+{/* <label>{t.customConstraintLabel}</label>
 <textarea
-  value={customConstraintsText}
-  onChange={(e) => setCustomConstraintsText(e.target.value)}
+  value={localizedFields[language]?.constraints || ''}
   rows={4}
   tabIndex={3}
   style={styles.textarea}
+  onChange={(e) => {
+    const val = e.target.value;
+    setLocalizedFields(prev => ({
+      ...prev,
+      [language]: { ...prev[language], constraints: val }
+    }));
+    setCustomConstraintsText(val);
+  }}
   placeholder={t.customConstraintPlaceholder}
-/>
+/> */}
+<label>Constraint Hint JSON</label>
+  <textarea     tabIndex={2}
+  rows={4}
+  style={styles.textarea} onChange={(e) => handleJsonInput('constraintHint', e.target.value)} />
 
-<label>{t.labelInfoLabel}</label>
+
+
+
+
+
+{/* <label>{t.labelInfoLabel}</label>
+
 <textarea
-tabIndex={2}
-  value={labelHintsText}
-  onChange={(e) => setLabelHintsText(e.target.value)}
+    value={localizedFields[language]?.labelHints || ''}
+    onChange={(e) => {
+      const val = e.target.value;
+      setLocalizedFields(prev => ({
+        ...prev,
+        [language]: { ...prev[language], labelHints: val }
+      }));
+      setLabelHintsText(val);
+    }}
+    placeholder={t.labelInfoPlaceholder}
+    tabIndex={2}
   rows={4}
   style={styles.textarea}
-  placeholder={t.labelInfoPlaceholder}
-/>
+  /> */}
+
+<label>Info Hint JSON</label>
+  <textarea     tabIndex={2}
+  rows={4}
+  style={styles.textarea} onChange={(e) => handleJsonInput('infoHint', e.target.value)} />
+
+<label>Cross Field Validation</label>
+  <textarea
+  rows={1}
+  style={styles.textarea} />
+
+<label>Back-End Based Validation</label>
+  <textarea
+  rows={1}
+  style={styles.textarea} />
+
+<label>Special Validation</label>
+  <textarea
+  rows={1}
+  style={styles.textarea} />
+
 
 <div style={styles.dividerContainer}>
   <div style={styles.dividerLine}></div>
@@ -384,18 +588,34 @@ tabIndex={2}
   <div style={styles.dividerLine}></div>
 </div>
     <h2>{t.previewTitle}</h2>
-
+    <h3>Preview Language Selection</h3>
+    <select
+      style={{
+        padding: '8px 12px',
+        border: '1px solid #ccc',
+        borderRadius: '6px',
+        fontSize: '14px',
+        backgroundColor: '#fff',
+        color: '#333',
+        cursor: 'pointer',
+        minWidth: '100px'
+      }}
+    value={selectedPreviewLang} onChange={(e) => setSelectedPreviewLang(e.target.value)}>
+      {userLanguages.map((lang) => (
+        <option key={lang} value={lang}>{lang}</option>
+      ))}
+    </select>
       <div style={styles.constraintHeader}>
         <div>
         <span style={{ fontSize: '1.2em', marginRight: 6 }}>{myIcon}</span>
-      <label style={{ marginRight: 8 }}>{myLabel}</label>
+      <label style={{ marginRight: 8 }}>{fieldData.labelText[selectedPreviewLang] || '-'}</label>
 
         <label style={{ marginRight: 8 }}>
           {isRequired ? '*' : ''}:
         </label>
         </div>
         <div  style={{marginInlineStart:'35px'}}>
-        <InfoTooltip tooltipText={getLabelHints().join('\n')} />
+        <InfoTooltip tooltipText={getLabelHints()?.join('\n')} />
         </div>
 
       </div>
@@ -404,7 +624,7 @@ tabIndex={2}
       <input
       tabIndex={1}
     type="text"
-    placeholder={myPlaceholder}
+    placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
     value={inputValue}
     onChange={(e) => {
       const val = e.target.value;
@@ -412,8 +632,8 @@ tabIndex={2}
       setInputValue(masked);
       validateInput(masked);
     }}
-    onPaste={copyPasteGuard ? (e) => e.preventDefault() : undefined}
-    onCopy={copyPasteGuard ? (e) => e.preventDefault() : undefined}
+    onPaste={pasteGuard ? (e) => e.preventDefault() : undefined}
+    // onCopy={copyPasteGuard ? (e) => e.preventDefault() : undefined}
     style={{
       ...styles.input,
       width: '100%',
@@ -423,7 +643,7 @@ tabIndex={2}
       borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
     }}
   />
-  {!copyPasteGuard && (
+  {(!pasteGuard && showPasteButton ) && (
     <button
       onClick={async () => {
         const clip = await navigator.clipboard.readText();
