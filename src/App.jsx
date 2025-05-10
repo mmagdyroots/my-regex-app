@@ -5,8 +5,20 @@ const translations = {
   en: {
     creatorTitle: "🎛️ Creator",
     previewTitle: "🧪 Preview",
+    selectInputType: "Select Data Type",
+    idLabel: "ID",
+    text:"Text",
+    number:"Number",
+    date:"Date",
+    email:"Email",
+    enterId: "Enter the ID",
+    idNotUnique : "The ID Already Exists",
     regexPattern: "Regex Pattern:",
     inputLabel: "Input Label Text:",
+    descriptionLabel: "Description",
+    enterDescription:"Enter description (shown in preview)",
+    aiDescriptionLabel: "AI Description",
+    enterAiDescription: "Enter AI description",
     iconLabel: "Icon Before Label:",
     fieldRequired: "Field is Required",
     inputPlaceholder: "Input Placeholder Text:",
@@ -50,9 +62,21 @@ const translations = {
   ar: {
     creatorTitle: "🎛️ المُنشئ",
     previewTitle: "🧪 المعاينة",
+    selectInputType: "ادخل نوع الادخال",
+    text:"نص",
+    number:"رقم",
+    date:"تاريخ",
+    email:"ايميل",
+    idLabel: "الرقم التعريفي",
+    enterId: "ادخل الرقم التعريفي",
+    idNotUnique : "الرقم التعريفي موجود بالفعل",
     regexPattern: "نمط التعبير النمطي:",
     inputLabel: "نص تسمية الإدخال:",
     iconLabel: "الأيقونة قبل التسمية:",
+    descriptionLabel: "الوصف",
+    enterDescription:"أدخل الوصف (يظهر في المعاينة)",
+    aiDescriptionLabel: "الوصف للذكاء الاصطناعي",
+    enterAiDescription: "أدخل وصف الذكاء الاصطناعي",
     fieldRequired: "الحقل مطلوب",
     inputPlaceholder: "نص العنصر النائب للإدخال:",
     inputPlaceholderHolder: "نص العنصر النائب",
@@ -103,23 +127,26 @@ const App = () => {
   const [regexObj, setRegexObj] = useState(new RegExp(regexInput));
 
   const [myIcon, setMyIcon] = useState('✉️');
-  const [myLabel, setMyLabel] = useState('My Test Email');
-  const [myPlaceholder, setMyPlaceholder] = useState('m.magdy@roots.solutions');
-  const [customConstraintsText, setCustomConstraintsText] = useState('');
-  const [labelHintsText, setLabelHintsText] = useState('');
   const [isRequired, setIsRequired] = useState(false);
 
   const [isInputMaskEnabled, setIsInputMaskEnabled] = useState(false);
   const [inputMaskPattern, setInputMaskPattern] = useState('');
 
   const [pasteGuard, setPasteGuard] = useState(true);
+  const [copyGuard, setCopyGuard] = useState(true);
   const [showPasteButton, setShowPasteButton] = useState(false);
-
-
+  const [showCopyButton, setShowCopyButton] = useState(false);
+  const [isPreviewReadonly, setIsPreviewReadonly] = useState(false);
+  const [idInput, setIdInput] = useState('');
+  const [existingIds, setExistingIds] = useState(['abc123', 'xyz456']); // Example existing IDs
+  const [isIdUnique, setIsIdUnique] = useState(true);
+  const [aiDescription, setAiDescription] = useState('');
 
   const [userLanguages, setUserLanguages] = useState(['en', 'ar']); // default
 const [newLang, setNewLang] = useState('');
 const [selectedPreviewLang, setSelectedPreviewLang] = useState('en');
+const [inputDataType, setInputDataType] = useState('text'); // Default type is 'text'
+
 
 const [fieldData, setFieldData] = useState({
   labelText: {},
@@ -127,15 +154,11 @@ const [fieldData, setFieldData] = useState({
   constraintHint: {},
   infoHint: {}
 });
-
-
-  // const getCustomConstraints = () => {
-  //   return customConstraintsText
-  //     .split('\n')
-  //     .map(line => line.trim())
-  //     .filter(line => line.length > 0)
-  //     .map(line => `⚠️ ${line}`);
-  // };
+const handleIdChange = (e) => {
+  const value = e.target.value;
+  setIdInput(value);
+  setIsIdUnique(!existingIds.includes(value.trim()));
+};
   const getCustomConstraints = () => {
     const list = [];
 
@@ -340,6 +363,24 @@ const [fieldData, setFieldData] = useState({
       </button>
       <br />
       <h2>{t.creatorTitle}</h2>
+      <div>
+        <label>{t.idLabel || 'ID'}</label>
+        <input
+          type="text"
+          value={idInput}
+          onChange={handleIdChange}
+          style={{
+            ...styles.input,
+            borderColor: isIdUnique ? '#ccc' : 'red',
+          }}
+          placeholder={t.enterId || 'Enter unique ID'}
+        />
+        {!isIdUnique && (
+          <span style={{ color: 'red', fontSize: '12px' }}>
+            {t.idNotUnique || 'This ID is already in use.'}
+          </span>
+        )}
+      </div>
       <label>{t.regexPattern}</label>
       <input
         type="text"
@@ -413,6 +454,48 @@ onClick={() => {
         style={styles.input}
         placeholder={t.iconExample}
       />
+
+
+<div style={{ marginBottom: '10px' }}>
+    <label htmlFor="inputDataType">{t.selectInputType}</label>
+    <select
+      id="inputDataType"
+      value={inputDataType}
+      onChange={(e) => setInputDataType(e.target.value)}
+      style={styles.input}
+    >
+      <option value="text">{t.text}</option>
+      <option value="number">{t.number}</option>
+      <option value="date">{t.date}</option>
+      <option value="email">{t.email}</option>
+    </select>
+  </div>
+
+<label style={{ marginTop: '10px', display: 'block' }}>
+    {t.descriptionLabel || 'Description'}
+  </label>
+  <textarea     tabIndex={2}
+  rows={4}
+  placeholder={t.enterDescription || 'Enter description (shown in preview)'}
+  style={styles.textarea} onChange={(e) => handleJsonInput('description', e.target.value)} />
+
+
+
+
+  {/* AI Description Field */}
+  <label style={{ marginTop: '10px', display: 'block' }}>
+    {t.aiDescriptionLabel || 'AI Description'}
+  </label>
+  <input
+    type="text"
+    value={aiDescription}
+    onChange={(e) => setAiDescription(e.target.value)}
+    style={styles.input}
+    placeholder={t.enterAiDescription || 'Enter AI description'}
+  />
+
+
+
       <label>
       <input
         type="checkbox"
@@ -446,24 +529,65 @@ onClick={() => {
     />
   </>
 )}
+
+{
+  isPreviewReadonly ?
+  (
+  <>
+  <label>
+    <input
+      type="checkbox"
+      checked={copyGuard}
+      onChange={(e) => setCopyGuard(e.target.checked)}
+      style={{ marginRight: 8 }}
+    />
+    {language === 'ar' ? 'منع النسخ' : 'Copy Guard'}
+  </label>
+  <label>
+    <input
+      type="checkbox"
+      checked={showCopyButton}
+      onChange={(e) => setShowCopyButton(e.target.checked)}
+      style={{ marginRight: 8 }}
+    />
+    {language === 'ar' ? 'ظهور ضغط النسخ' : 'Show Copy Button'}
+  </label>
+  </>
+  ):
+  (
+  <>
+  <label>
+    <input
+      type="checkbox"
+      checked={pasteGuard}
+      onChange={(e) => setPasteGuard(e.target.checked)}
+      style={{ marginRight: 8 }}
+    />
+    {language === 'ar' ? 'منع اللصق' : 'Paste Guard'}
+  </label>
+  <label>
+    <input
+      type="checkbox"
+      checked={showPasteButton}
+      onChange={(e) => setShowPasteButton(e.target.checked)}
+      style={{ marginRight: 8 }}
+    />
+    {language === 'ar' ? 'ظهور ضغط اللصق' : 'Show Paste Button'}
+  </label>
+  </>
+  )
+}
+
+
+<br />
 <label>
-  <input
-    type="checkbox"
-    checked={pasteGuard}
-    onChange={(e) => setPasteGuard(e.target.checked)}
-    style={{ marginRight: 8 }}
-  />
-  {language === 'ar' ? 'منع اللصق' : 'Paste Guard'}
-</label>
-<label>
-  <input
-    type="checkbox"
-    checked={showPasteButton}
-    onChange={(e) => setShowPasteButton(e.target.checked)}
-    style={{ marginRight: 8 }}
-  />
-  {language === 'ar' ? 'ظهور ضغط اللصق' : 'Show Paste Button'}
-</label>
+    <input
+      type="checkbox"
+      checked={isPreviewReadonly}
+      onChange={() => setIsPreviewReadonly(prev => !prev)}
+    />
+  {language === 'ar' ? 'عرض فقط (غير قابل للتعديل)' : 'Display-Only Preview'}
+  </label>
 
 <br />
 
@@ -539,17 +663,18 @@ onClick={() => {
       <div style={{ position: 'relative', width: '100%' }}>
       <input
       tabIndex={1}
-    type="text"
-    placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
+      type={inputDataType}  // Dynamically setting the input type
+      placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
     value={inputValue}
+    readOnly={isPreviewReadonly}
     onChange={(e) => {
       const val = e.target.value;
       const masked = isInputMaskEnabled ? applyInputMask(val, inputMaskPattern) : val;
       setInputValue(masked);
       validateInput(masked);
     }}
-    onPaste={pasteGuard ? (e) => e.preventDefault() : undefined}
-    // onCopy={copyPasteGuard ? (e) => e.preventDefault() : undefined}
+    onPaste={!isPreviewReadonly && pasteGuard ? (e) => e.preventDefault() : undefined}
+    onCopy={isPreviewReadonly && copyGuard ? (e) => e.preventDefault() : undefined}
     style={{
       ...styles.input,
       width: '100%',
@@ -559,7 +684,7 @@ onClick={() => {
       borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
     }}
   />
-  {(!pasteGuard && showPasteButton ) && (
+  {(!pasteGuard && showPasteButton && !isPreviewReadonly ) && (
     <button
       onClick={async () => {
         const clip = await navigator.clipboard.readText();
@@ -579,11 +704,37 @@ onClick={() => {
       {language === 'ar' ? 'لصق' : 'Paste'}
     </button>
   )}
+
+{(!copyGuard && showCopyButton && isPreviewReadonly ) && (
+      <button
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(inputValue);
+        } catch (err) {
+          console.error('Failed to copy: ', err);
+        }
+      }}
+      style={{
+        marginLeft: 8,
+        marginTop: -15,
+        position: 'absolute',
+        [language === 'ar' ? 'left' : 'right']: 10,
+        padding: '4px 8px',
+        cursor: 'pointer'
+      }}
+    >
+      {language === 'ar' ? 'نسخ' : 'Copy'}
+    </button>
+  )}
 <InfoTooltip
   tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
 />
       </div>
-
+      {fieldData.description?.[selectedPreviewLang] && (
+    <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+      {fieldData.description[selectedPreviewLang]}
+    </div>
+  )}
       {errorMessage && (
         <div style={styles.errorBox}>
           {errorMessage.split('\n').map((line, idx) => (
