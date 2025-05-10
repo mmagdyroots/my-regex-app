@@ -377,10 +377,6 @@ onClick={() => {
   const trimmed = newLang.trim();
   if (trimmed && !userLanguages.includes(trimmed)) {
     setUserLanguages([...userLanguages, trimmed]);
-    // setLocalizedFields(prev => ({
-    //   ...prev,
-    //   [trimmed]: { label: '', placeholder: '', constraints: '', labelHints: '' }
-    // }));
     setNewLang('');
   }
 }}>Add Language</button>
@@ -398,32 +394,12 @@ style={{
 onClick={() => {
   if (userLanguages.includes(newLang)) {
     setUserLanguages(userLanguages.filter(lang => lang !== newLang));
-    // setLocalizedFields(prev => {
-    //   const copy = { ...prev };
-    //   delete copy[newLang];
-    //   return copy;
-    // });
     setNewLang('');
   }
 }}>Remove Language</button>
 <br />
 <br />
-      {/* <label>{t.inputLabel}</label>
-      <input
-        type="text"
-        value={localizedFields[language]?.label || ''}
-        style={styles.input}
 
-        onChange={(e) => {
-          const val = e.target.value;
-          setLocalizedFields(prev => ({
-            ...prev,
-            [language]: { ...prev[language], label: val }
-          }));
-          setMyLabel(val);
-        }}
-        placeholder={t.enterLabel}
-      /> */}
   <label>Label Text JSON</label>
   <textarea     tabIndex={2}
   rows={4}
@@ -490,76 +466,16 @@ onClick={() => {
 </label>
 
 <br />
-      {/* <label>{t.inputPlaceholder}</label>
-      <input
-        type="text"
-        value={localizedFields[language]?.placeholder || ''}
-        style={styles.input}
-        onChange={(e) => {
-          const val = e.target.value;
-          setLocalizedFields(prev => ({
-            ...prev,
-            [language]: { ...prev[language], placeholder: val }
-          }));
-          setMyPlaceholder(val);
-        }}
-        placeholder={t.inputPlaceholderHolder}
-      /> */}
 
 <label>Placeholder JSON</label>
   <textarea     tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('placeholder', e.target.value)} />
 
-
-
-
-
-
-
-{/* <label>{t.customConstraintLabel}</label>
-<textarea
-  value={localizedFields[language]?.constraints || ''}
-  rows={4}
-  tabIndex={3}
-  style={styles.textarea}
-  onChange={(e) => {
-    const val = e.target.value;
-    setLocalizedFields(prev => ({
-      ...prev,
-      [language]: { ...prev[language], constraints: val }
-    }));
-    setCustomConstraintsText(val);
-  }}
-  placeholder={t.customConstraintPlaceholder}
-/> */}
 <label>Constraint Hint JSON</label>
   <textarea     tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('constraintHint', e.target.value)} />
-
-
-
-
-
-
-{/* <label>{t.labelInfoLabel}</label>
-
-<textarea
-    value={localizedFields[language]?.labelHints || ''}
-    onChange={(e) => {
-      const val = e.target.value;
-      setLocalizedFields(prev => ({
-        ...prev,
-        [language]: { ...prev[language], labelHints: val }
-      }));
-      setLabelHintsText(val);
-    }}
-    placeholder={t.labelInfoPlaceholder}
-    tabIndex={2}
-  rows={4}
-  style={styles.textarea}
-  /> */}
 
 <label>Info Hint JSON</label>
   <textarea     tabIndex={2}
@@ -671,7 +587,7 @@ onClick={() => {
       {errorMessage && (
         <div style={styles.errorBox}>
           {errorMessage.split('\n').map((line, idx) => (
-            <div key={idx}>{myLabel} {line}</div>
+            <div key={idx}>{fieldData.labelText[selectedPreviewLang] || '-'} {line}</div>
           ))}
         </div>
       )}
