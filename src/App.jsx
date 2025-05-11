@@ -5,6 +5,9 @@ const translations = {
   en: {
     creatorTitle: "🎛️ Creator",
     previewTitle: "🧪 Preview",
+    previewLanguageSelection: "Preview Language Selection",
+    inputPart: "Input",
+    displayPart: "Display",
     selectInputType: "Select Data Type",
     idLabel: "ID",
     text:"Text",
@@ -86,6 +89,9 @@ const translations = {
     placeholderExample: "أدخل النص التوضيحي",
     regexError: "❌ صيغة النمط غير صالحة.",
     success: "✅ الإدخال صحيح!",
+    previewLanguageSelection: "اختيار اللغة",
+    inputPart: "ادخال",
+    displayPart: "عرض",
     inputErrorPrefix: "",
     enterLabel: "أدخل نص التسمية",
     enterIcon: "مثال: ✉️",
@@ -136,7 +142,6 @@ const App = () => {
   const [copyGuard, setCopyGuard] = useState(true);
   const [showPasteButton, setShowPasteButton] = useState(false);
   const [showCopyButton, setShowCopyButton] = useState(false);
-  const [isPreviewReadonly, setIsPreviewReadonly] = useState(false);
   const [idInput, setIdInput] = useState('');
   const [existingIds, setExistingIds] = useState(['abc123', 'xyz456']); // Example existing IDs
   const [isIdUnique, setIsIdUnique] = useState(true);
@@ -152,7 +157,9 @@ const [fieldData, setFieldData] = useState({
   labelText: {},
   placeholder: {},
   constraintHint: {},
-  infoHint: {}
+  infoHint: {},
+  displayInfoHint:{},
+  description:{}
 });
 const handleIdChange = (e) => {
   const value = e.target.value;
@@ -180,6 +187,18 @@ const handleIdChange = (e) => {
     let temp = fieldData.infoHint[selectedPreviewLang]
     if(temp){
       return fieldData.infoHint[selectedPreviewLang]
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map(line => `- ${line}`);
+    }
+
+  };
+
+  const getDisplayHints = () => {
+    let temp = fieldData.displayInfoHint[selectedPreviewLang]
+    if(temp){
+      return fieldData.displayInfoHint[selectedPreviewLang]
       .split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0)
@@ -286,6 +305,8 @@ const handleIdChange = (e) => {
       ...Object.keys(fieldData.placeholder),
       ...Object.keys(fieldData.constraintHint),
       ...Object.keys(fieldData.infoHint),
+      ...Object.keys(fieldData.displayInfoHint),
+      ...Object.keys(fieldData.description)
     ]);
     return Array.from(all);
   };
@@ -472,7 +493,7 @@ onClick={() => {
   </div>
 
 <label style={{ marginTop: '10px', display: 'block' }}>
-    {t.descriptionLabel || 'Description'}
+    {(t.descriptionLabel || 'Description') + ' JSON'}
   </label>
   <textarea     tabIndex={2}
   rows={4}
@@ -530,10 +551,8 @@ onClick={() => {
   </>
 )}
 
-{
-  isPreviewReadonly ?
-  (
-  <>
+
+  <div>
   <label>
     <input
       type="checkbox"
@@ -552,10 +571,9 @@ onClick={() => {
     />
     {language === 'ar' ? 'ظهور ضغط النسخ' : 'Show Copy Button'}
   </label>
-  </>
-  ):
-  (
-  <>
+  </div>
+
+  <div>
   <label>
     <input
       type="checkbox"
@@ -574,20 +592,7 @@ onClick={() => {
     />
     {language === 'ar' ? 'ظهور ضغط اللصق' : 'Show Paste Button'}
   </label>
-  </>
-  )
-}
-
-
-<br />
-<label>
-    <input
-      type="checkbox"
-      checked={isPreviewReadonly}
-      onChange={() => setIsPreviewReadonly(prev => !prev)}
-    />
-  {language === 'ar' ? 'عرض فقط (غير قابل للتعديل)' : 'Display-Only Preview'}
-  </label>
+  </div>
 
 <br />
 
@@ -596,15 +601,22 @@ onClick={() => {
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('placeholder', e.target.value)} />
 
+<label>Input Info Hint JSON</label>
+  <textarea     tabIndex={2}
+  rows={4}
+  style={styles.textarea} onChange={(e) => handleJsonInput('infoHint', e.target.value)} />
+
+<label>Display Info Hint JSON</label>
+  <textarea     tabIndex={2}
+  rows={4}
+  style={styles.textarea} onChange={(e) => handleJsonInput('displayInfoHint', e.target.value)} />
+
+
 <label>Constraint Hint JSON</label>
   <textarea     tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('constraintHint', e.target.value)} />
 
-<label>Info Hint JSON</label>
-  <textarea     tabIndex={2}
-  rows={4}
-  style={styles.textarea} onChange={(e) => handleJsonInput('infoHint', e.target.value)} />
 
 <label>Cross Field Validation</label>
   <textarea
@@ -628,7 +640,7 @@ onClick={() => {
   <div style={styles.dividerLine}></div>
 </div>
     <h2>{t.previewTitle}</h2>
-    <h3>Preview Language Selection</h3>
+    <h3>{t.previewLanguageSelection}</h3>
     <select
       style={{
         padding: '8px 12px',
@@ -660,21 +672,27 @@ onClick={() => {
 
       </div>
 
+
+
+
+
+
       <div style={{ position: 'relative', width: '100%' }}>
+      <label>{t.inputPart}</label>
+        
       <input
       tabIndex={1}
       type={inputDataType}  // Dynamically setting the input type
       placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
     value={inputValue}
-    readOnly={isPreviewReadonly}
     onChange={(e) => {
       const val = e.target.value;
       const masked = isInputMaskEnabled ? applyInputMask(val, inputMaskPattern) : val;
       setInputValue(masked);
       validateInput(masked);
     }}
-    onPaste={!isPreviewReadonly && pasteGuard ? (e) => e.preventDefault() : undefined}
-    onCopy={isPreviewReadonly && copyGuard ? (e) => e.preventDefault() : undefined}
+    onPaste={pasteGuard ? (e) => e.preventDefault() : undefined}
+    // onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
     style={{
       ...styles.input,
       width: '100%',
@@ -684,7 +702,8 @@ onClick={() => {
       borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
     }}
   />
-  {(!pasteGuard && showPasteButton && !isPreviewReadonly ) && (
+  
+  {(!pasteGuard && showPasteButton ) && (
     <button
       onClick={async () => {
         const clip = await navigator.clipboard.readText();
@@ -705,7 +724,66 @@ onClick={() => {
     </button>
   )}
 
-{(!copyGuard && showCopyButton && isPreviewReadonly ) && (
+<InfoTooltip
+  tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
+/>
+      </div>
+
+
+
+
+      <div style={{ position: 'relative', width: '100%' }}>
+      <label>{t.displayPart}</label>
+
+      <input
+      tabIndex={1}
+      // type={inputDataType}  // Dynamically setting the input type
+      placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
+    value={inputValue}
+    readOnly={true}
+    onChange={(e) => {
+      const val = e.target.value;
+      const masked = isInputMaskEnabled ? applyInputMask(val, inputMaskPattern) : val;
+      setInputValue(masked);
+      validateInput(masked);
+    }}
+    onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
+    style={{
+      ...styles.input,
+      width: '100%',
+      paddingRight: language === 'ar' ? '30px' : '60px',
+      paddingLeft: language === 'ar' ? '60px' : '30px',
+      boxSizing: 'border-box',
+      borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
+    }}
+  />
+
+  {/* Hyperlink Open Button */}
+  {isValid && ( inputValue.startsWith('http://') || inputValue.startsWith('https://') || inputValue.includes('@') || (/^\+?[0-9\s\-().]+$/.test(inputValue)) ) && (
+    <button
+      onClick={() => {
+        if (inputValue.startsWith('http://') || inputValue.startsWith('https://')) {
+          window.open(inputValue, '_blank');
+        } else if (inputValue.includes('@')) {
+          window.location.href = `mailto:${inputValue}`;
+        } else if (/^\+?[0-9\s\-().]+$/.test(inputValue)) {
+          window.location.href = `tel:${inputValue}`;
+        }
+      }}
+      style={{
+        position: 'absolute',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        [language === 'ar' ? 'left' : 'right']: 70,
+        padding: '4px 8px',
+        cursor: 'pointer'
+      }}
+    >
+      {language === 'ar' ? 'اذهب' : 'Go'}
+    </button>
+  )}
+
+{(!copyGuard && showCopyButton ) && (
       <button
       onClick={async () => {
         try {
@@ -726,10 +804,58 @@ onClick={() => {
       {language === 'ar' ? 'نسخ' : 'Copy'}
     </button>
   )}
-<InfoTooltip
-  tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
-/>
+
+    {/* Quick Action Buttons */}
+    {isValid && inputValue && inputValue.includes('@') && (
+    <button
+      onClick={() => window.location.href = `mailto:${inputValue}`}
+      style={{
+        position: 'absolute',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        [language === 'ar' ? 'left' : 'right']: 120,
+        padding: '4px 8px',
+        cursor: 'pointer'
+      }}
+    >
+      {language === 'ar' ? 'إرسال بريد' : 'Email'}
+    </button>
+  )}
+
+  {isValid && inputValue && /^\+?[0-9\s\-().]+$/.test(inputValue) && (
+    <button
+      onClick={() => window.location.href = `sms:${inputValue}`}
+      style={{
+        position: 'absolute',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        [language === 'ar' ? 'left' : 'right']: 120,
+        padding: '4px 8px',
+        cursor: 'pointer'
+      }}
+    >
+      {language === 'ar' ? 'رسالة' : 'Message'}
+    </button>
+  )}
+
+<InfoTooltip tooltipText={getDisplayHints()?.join('\n')} />
       </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       {fieldData.description?.[selectedPreviewLang] && (
     <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
       {fieldData.description[selectedPreviewLang]}
