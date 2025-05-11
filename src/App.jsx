@@ -609,6 +609,12 @@ const [fieldData, setFieldData] = useState({
   const [formatType, setFormatType] = useState('none');
   const [customPattern, setCustomPattern] = useState('');
   const [customReplacement, setCustomReplacement] = useState('');
+
+  const [isLocalizedEnabled, setIsLocalizedEnabled] = useState(false);
+const [selectedCountry, setSelectedCountry] = useState('');
+
+const [isMeasurementUnitEnabled , setIsMeasurementUnitEnabled ] = useState(false);
+const [selectedMeasurementUnit, setSelectedMeasurementUnit] = useState('');
   
   const actions = [
     { type: 'email', label: language === 'ar' ? 'إرسال بريد' : 'Email' },
@@ -622,7 +628,13 @@ const [fieldData, setFieldData] = useState({
     { type: 'instagram', label: language === 'ar' ? 'افتح انستجرام' : 'Open Instagram' },
     { type: 'facebook', label: language === 'ar' ? 'افتح فيسبوك' : 'Open Facebook' }
   ];
-
+const unitCategories = {
+  Length: ['Meter', 'Kilometer', 'Centimeter', 'Inch', 'Foot', 'Mile'],
+  Weight: ['Gram', 'Kilogram', 'Pound', 'Ounce', 'Ton'],
+  Temperature: ['Celsius', 'Fahrenheit', 'Kelvin'],
+  Volume: ['Liter', 'Milliliter', 'Gallon', 'Cubic meter'],
+  Time: ['Second', 'Minute', 'Hour', 'Day'],
+};
 const handleAction = () => {
     let url = '';
     switch (selectedAction) {
@@ -1249,6 +1261,77 @@ onClick={() => {
   rows={1}
   style={styles.textarea} />
 
+
+{/* Localized Checkbox and Country Dropdown */}
+<div style={{ marginTop: '10px' }}>
+  <label>
+    <input
+      type="checkbox"
+      checked={isLocalizedEnabled}
+            onChange={(e) => {
+        setIsLocalizedEnabled(e.target.checked);
+        if (e.target.checked) setIsMeasurementUnitEnabled(false); // disable other
+      }}
+      style={{ marginRight: 8 }}
+    />
+    {language === 'ar' ? 'تمكين التوطين' : 'Enable Localized'}
+  </label>
+  {isLocalizedEnabled && (
+    <select
+      value={selectedCountry}
+      onChange={(e) => setSelectedCountry(e.target.value)}
+      style={styles.input}
+    >
+      <option value="">{language === 'ar' ? '- اختر دولة -' : '- Select Country -'}</option>
+      <option value="us">United States</option>
+      <option value="uk">United Kingdom</option>
+      <option value="de">Germany</option>
+      <option value="fr">France</option>
+      <option value="eg">Egypt</option>
+      {/* Add more countries as needed */}
+    </select>
+  )}
+</div>
+
+{/* Measuring Units Checkbox and Dropdown */}
+<div style={{ marginTop: '10px' }}>
+  <label>
+    <input
+      type="checkbox"
+      checked={isMeasurementUnitEnabled}
+       onChange={(e) => {
+        setIsMeasurementUnitEnabled(e.target.checked);
+        if (e.target.checked) setIsLocalizedEnabled(false); // disable other
+      }}
+      style={{ marginRight: 8 }}
+    />
+    {language === 'ar' ? 'الوحدات' : 'Measuring Units'}
+  </label>
+
+  {isMeasurementUnitEnabled && (
+    <select
+      value={selectedMeasurementUnit}
+      onChange={(e) => setSelectedMeasurementUnit(e.target.value)}
+      style={{ ...styles.input, marginTop: '10px' }}
+    >
+      <option value="">{language === 'ar' ? '- اختر وحدة -' : '- Select Unit -'}</option>
+      {Object.entries(unitCategories).map(([category, units]) => (
+        <optgroup key={category} label={category}>
+          {units.map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
+          ))}
+        </optgroup>
+      ))}
+    </select>
+  )}
+</div>
+
+
+
+
+
+
+
     <h2>{t.previewTitle}</h2>
 
 
@@ -1513,7 +1596,7 @@ onClick={() => {
         <input
           tabIndex={1}
           placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
-          value={formatValue(inputValue)}
+          value={formatValue(inputValue) + (isMeasurementUnitEnabled && selectedMeasurementUnit ? '  (' + selectedMeasurementUnit +')':'')}
           readOnly={true}
           onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
           style={{
