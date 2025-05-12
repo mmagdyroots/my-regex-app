@@ -808,7 +808,10 @@ const [selectedCountry, setSelectedCountry] = useState('');
 
 const [isMeasurementUnitEnabled , setIsMeasurementUnitEnabled ] = useState(false);
 const [selectedMeasurementUnit, setSelectedMeasurementUnit] = useState('');
-  
+const [selectedDisplayUnit, setSelectedDisplayUnit] = useState('');
+const [convertedValue, setConvertedValue] = useState('');
+
+
   const actions = [
     { type: 'email', label: language === 'ar' ? 'إرسال بريد' : 'Email' },
     { type: 'call', label: language === 'ar' ? 'اتصال' : 'Call' },
@@ -954,7 +957,31 @@ function getMatchedFieldType(fieldData, userLang, selectedCountry, validationRul
   }
 }
 
+function convertValue(value, fromUnit, toUnit) {
+  if (fromUnit === toUnit) return value;
 
+  const tempMap = {
+    Celsius: {
+      Fahrenheit: (c) => (c * 9) / 5 + 32,
+      Kelvin: (c) => c + 273.15,
+    },
+    Fahrenheit: {
+      Celsius: (f) => ((f - 32) * 5) / 9,
+      Kelvin: (f) => ((f - 32) * 5) / 9 + 273.15,
+    },
+    Kelvin: {
+      Celsius: (k) => k - 273.15,
+      Fahrenheit: (k) => ((k - 273.15) * 9) / 5 + 32,
+    },
+    // Add other unit types here as needed
+  };
+
+  if (tempMap[fromUnit] && tempMap[fromUnit][toUnit]) {
+    return tempMap[fromUnit][toUnit](value).toFixed(2);
+  }
+
+  return 'Conversion not supported';
+}
 
 const handleIdChange = (e) => {
   const value = e.target.value;
@@ -1785,6 +1812,9 @@ onClick={() => {
       <div style={{ position: 'relative', width: '100%' }}>
       <label>{t.inputPart}</label>
         
+
+        <div style={{ position: 'relative', width: '100%' }}>
+
       <input
       tabIndex={1}
       type={inputDataType || 'text'}  // Dynamically setting the input type
@@ -1795,6 +1825,15 @@ onClick={() => {
       const masked = isInputMaskEnabled ? applyInputMask(val, inputMaskPattern) : val;
       setInputValue(masked);
       validateInput(masked);
+          if (masked && selectedMeasurementUnit && selectedDisplayUnit) {
+      setConvertedValue(
+        convertValue(
+          parseFloat(masked),
+          selectedMeasurementUnit,
+          selectedDisplayUnit
+        )
+      );
+    }
     }}
     onPaste={pasteGuard ? (e) => e.preventDefault() : undefined}
     // onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
@@ -1807,6 +1846,23 @@ onClick={() => {
       borderColor: isValid === true ? 'green' : isValid === false ? 'red' : '#ccc',
     }}
   />
+<InfoTooltip
+  tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
+/>
+  {isMeasurementUnitEnabled && selectedMeasurementUnit && (
+    <span style={{
+      position: 'absolute',
+      right: '70px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      pointerEvents: 'none',
+      color: '#888',
+    }}>
+      ({selectedMeasurementUnit})
+    </span>
+  )}
+</div>
+
   
   {(!pasteGuard && showPasteButton ) && (
     <button
@@ -1829,9 +1885,7 @@ onClick={() => {
     </button>
   )}
 
-<InfoTooltip
-  tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
-/>
+
       </div>
 
       {errorMessage && (
@@ -1856,6 +1910,40 @@ onClick={() => {
       <div style={{ position: 'relative', width: '100%' }}>
       <label>{t.displayPart}</label>
 
+
+
+      {/* Output Unit Dropdown */}
+      {selectedMeasurementUnit && (
+        <select
+          value={selectedDisplayUnit}
+          onChange={(e) => {
+            const val = e.target.value;
+            setSelectedDisplayUnit(val);
+            if (inputValue && val) {
+              setConvertedValue(
+                convertValue(
+                  parseFloat(inputValue),
+                  selectedMeasurementUnit,
+                  val
+                )
+              );
+            }
+          }}
+          style={{ ...styles.input, marginTop: '10px' }}
+        >
+          <option value="">{language === 'ar' ? '- اختر وحدة العرض -' : '- Select Display Unit -'}</option>
+          {Object.entries(unitCategories).map(([category, units]) =>
+            units.includes(selectedMeasurementUnit)
+              ? units.map((unit) => (
+                  <option key={unit} value={unit}>{unit}</option>
+                ))
+              : null
+          )}
+        </select>
+      )}
+
+<div style={{ position: 'relative', width: '100%' }}>
+
 {hyperLinkEnabled ? (
         <a
           href={hyperLinkValue}
@@ -1873,13 +1961,13 @@ onClick={() => {
             cursor: 'pointer'
           }}
         >
-          {formatValue(inputValue)}
+          {formatValue(convertedValue)}
         </a>
       ) : (
         <input
           tabIndex={1}
           placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
-          value={formatValue(inputValue) + (isMeasurementUnitEnabled && selectedMeasurementUnit ? '  (' + selectedMeasurementUnit +')':'')}
+          value={formatValue(convertedValue)}
           readOnly={true}
           onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
           style={{
@@ -1893,6 +1981,7 @@ onClick={() => {
           }}
         />
       )}
+<InfoTooltip tooltipText={getDisplayHints()?.join('\n')} />
 
 {(!copyGuard && showCopyButton ) && (
       <button
@@ -1932,7 +2021,20 @@ onClick={() => {
         </button>
       )}
 
-<InfoTooltip tooltipText={getDisplayHints()?.join('\n')} />
+  {isMeasurementUnitEnabled && selectedDisplayUnit && (
+    <span style={{
+      position: 'absolute',
+      right: '70px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      pointerEvents: 'none',
+      color: '#888',
+    }}>
+      {(isMeasurementUnitEnabled && selectedDisplayUnit ? '  (' + selectedDisplayUnit +')':'')}
+    </span>
+  )}
+</div>
+
       </div>
 
 
