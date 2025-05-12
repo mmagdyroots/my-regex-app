@@ -126,6 +126,188 @@ const translations = {
   },
 };
 
+const cardLocalizationData = {
+  "US": {
+    "phoneNumber": {
+      "regex": "^\\(\\d{3}\\) \\d{3}-\\d{4}$",
+      "mask": "(***) ***-****"
+    },
+    "postalCode": {
+      "regex": "^\\d{5}(-\\d{4})?$",
+      "mask": "*****-****"
+    },
+    "creditCard": {
+      "visa": {
+        "regex": "^4[0-9]{12}(?:[0-9]{3})?$",
+        "mask": "**** **** **** ****"
+      },
+      "mastercard": {
+        "regex": "^5[1-5][0-9]{14}$",
+        "mask": "**** **** **** ****"
+      },
+      "amex": {
+        "regex": "^3[47][0-9]{13}$",
+        "mask": "**** ****** *****"
+      }
+    },
+    "date": {
+      "regex": "^(0[1-9]|1[0-2])\\/([0-2][0-9]|3[01])\\/([0-9]{4})$",
+      "format": "MM/DD/YYYY"
+    }
+  },
+  "UK": {
+    "phoneNumber": {
+      "regex": "^\\+44\\s?\\d{4}\\s?\\d{6}$",
+      "mask": "+44 **** ******"
+    },
+    "postalCode": {
+      "regex": "^[A-Z]{1,2}\\d[A-Z\\d]? \\d[A-Z]{2}$",
+      "mask": "A*A *AA"
+    },
+    "creditCard": {
+      "visa": {
+        "regex": "^4[0-9]{12}(?:[0-9]{3})?$",
+        "mask": "**** **** **** ****"
+      },
+      "mastercard": {
+        "regex": "^5[1-5][0-9]{14}$",
+        "mask": "**** **** **** ****"
+      },
+      "amex": {
+        "regex": "^3[47][0-9]{13}$",
+        "mask": "**** ****** *****"
+      }
+    },
+    "date": {
+      "regex": "^(0[1-9]|1[0-2])\\/([0-2][0-9]|3[01])\\/([0-9]{4})$",
+      "format": "DD/MM/YYYY"
+    }
+  },
+  "EG": {
+    "phoneNumber": {
+      "regex": "^(\\+20|0)1[0-9]{9}$",
+      "mask": "+20 1*********"
+    },
+    "postalCode": {
+      "regex": "^\\d{5}$",
+      "mask": "*****"
+    },
+    "creditCard": {
+      "visa": {
+        "regex": "^4[0-9]{12}(?:[0-9]{3})?$",
+        "mask": "**** **** **** ****"
+      },
+      "mastercard": {
+        "regex": "^5[1-5][0-9]{14}$",
+        "mask": "**** **** **** ****"
+      },
+      "amex": {
+        "regex": "^3[47][0-9]{13}$",
+        "mask": "**** ****** *****"
+      }
+    },
+    "date": {
+      "regex": "^(0[1-9]|1[0-2])\\/([0-2][0-9]|3[01])\\/([0-9]{4})$",
+      "format": "DD/MM/YYYY"
+    }
+  },
+  "FR": {
+    "phoneNumber": {
+      "regex": "^\\+33\\s?\\d{1}\\s?\\d{8}$",
+      "mask": "+33 * ########"
+    },
+    "postalCode": {
+      "regex": "^\\d{5}$",
+      "mask": "*****"
+    },
+    "creditCard": {
+      "visa": {
+        "regex": "^4[0-9]{12}(?:[0-9]{3})?$",
+        "mask": "**** **** **** ****"
+      },
+      "mastercard": {
+        "regex": "^5[1-5][0-9]{14}$",
+        "mask": "**** **** **** ****"
+      },
+      "amex": {
+        "regex": "^3[47][0-9]{13}$",
+        "mask": "**** ****** *****"
+      }
+    },
+    "date": {
+      "regex": "^(0[1-9]|1[0-2])\\/([0-2][0-9]|3[01])\\/([0-9]{4})$",
+      "format": "DD/MM/YYYY"
+    }
+  },
+  "DE": {
+    "phoneNumber": {
+      "regex": "^\\+49\\s?\\d{2,3}\\s?\\d{7,8}$",
+      "mask": "+49 *** ******"
+    },
+    "postalCode": {
+      "regex": "^\\d{5}$",
+      "mask": "*****"
+    },
+    "creditCard": {
+      "visa": {
+        "regex": "^4[0-9]{12}(?:[0-9]{3})?$",
+        "mask": "**** **** **** ****"
+      },
+      "mastercard": {
+        "regex": "^5[1-5][0-9]{14}$",
+        "mask": "**** **** **** ****"
+      },
+      "amex": {
+        "regex": "^3[47][0-9]{13}$",
+        "mask": "**** ****** *****"
+      }
+    },
+    "date": {
+      "regex": "^(0[1-9]|1[0-2])\\/([0-2][0-9]|3[01])\\/([0-9]{4})$",
+      "format": "DD/MM/YYYY"
+    }
+  },
+  "IN": {
+    "phoneNumber": {
+      "regex": "^(\\+91|0)?[789]\\d{9}$",
+      "mask": "+91 **********"
+    },
+    "postalCode": {
+      "regex": "^\\d{6}$",
+      "mask": "******"
+    },
+    "creditCard": {
+      "visa": {
+        "regex": "^4[0-9]{12}(?:[0-9]{3})?$",
+        "mask": "**** **** **** ****"
+      },
+      "mastercard": {
+        "regex": "^5[1-5][0-9]{14}$",
+        "mask": "**** **** **** ****"
+      },
+      "amex": {
+        "regex": "^3[47][0-9]{13}$",
+        "mask": "**** ****** *****"
+      }
+    },
+    "date": {
+      "regex": "^(0[1-9]|1[0-2])\\/([0-2][0-9]|3[01])\\/([0-9]{4})$",
+      "format": "DD/MM/YYYY"
+    }
+  }
+};
+
+const keywordMap = {
+  phoneNumber: ['phone', 'phoneNumber', 'phone_number', 'telephone', 'mobile', 'cell'],
+  postalCode: ['postal', 'postcode', 'post', 'zip'],
+  creditCard: {
+    visa: ['visa', 'credit visa', 'creditcard visa'],
+    mastercard: ['mastercard', 'credit mastercard', 'creditcard mastercard'],
+    amex: ['amex', 'american express']
+  },
+  date: ['date', 'calendar', 'history', 'birth', 'dd/mm', 'mm/dd']
+};
+
 const jsonExamples = {
   PersonalEmail: {
     id: 'email_1',
@@ -593,6 +775,8 @@ const [crossFieldValidation, setCrossFieldValidation] = useState(''); // Default
 const [backendValidation, setBackendValidation] = useState(''); // Default type is 'text'
 const [specialValidation, setSpecialValidation] = useState(''); // Default type is 'text'
 
+
+
 const [fieldData, setFieldData] = useState({
   labelText: {},
   placeholder: {},
@@ -601,6 +785,15 @@ const [fieldData, setFieldData] = useState({
   displayInfoHint:{},
   description:{}
 });
+const [placeholderText, setPlaceholderText] = useState(JSON.stringify(fieldData['placeholder'], null, 2));
+const [infoHintText, setInfoHintText] = useState(JSON.stringify(fieldData['infoHint'], null, 2));
+const [constraintHintText, setConstraintHintText] = useState(JSON.stringify(fieldData['constraintHint'], null, 2));
+const [descriptionText, setDescriptionText] = useState(JSON.stringify(fieldData['description'], null, 2));
+const [displayInfoHintText, setDisplayInfoHintText] = useState(JSON.stringify(fieldData['displayInfoHint'], null, 2));
+const [labelTextText, setLabelTextText] = useState(JSON.stringify(fieldData['labelText'], null, 2));
+
+
+
 
   const [hyperLinkEnabled, setHyperLinkEnabled] = useState(false);
   const [hyperLinkValue, setHyperLinkValue] = useState('');
@@ -695,6 +888,74 @@ const handleAction = () => {
         return value;
     }
   };
+
+function getMatchedFieldType(fieldData, userLang, selectedCountry, validationRules, setRegexInput, setInputMaskPattern) {
+  if (!selectedCountry || !validationRules[selectedCountry]) return;
+
+  const checkSources = [
+    fieldData.labelText?.[userLang],
+    fieldData.placeholder?.[userLang],
+    fieldData.infoHint?.[userLang],
+    fieldData.displayInfoHint?.[userLang],
+    fieldData.description?.[userLang]
+  ];
+
+  const allText = checkSources.map((s) => (s || '').toLowerCase()).join(' ');
+
+  // Count matches
+  const matchCounts = {
+    phoneNumber: 0,
+    postalCode: 0,
+    date: 0,
+    visa: 0,
+    mastercard: 0,
+    amex: 0
+  };
+
+  // Search for each keyword group
+  keywordMap.phoneNumber.forEach(keyword => {
+    if (allText.includes(keyword)) matchCounts.phoneNumber++;
+  });
+  keywordMap.postalCode.forEach(keyword => {
+    if (allText.includes(keyword)) matchCounts.postalCode++;
+  });
+  keywordMap.date.forEach(keyword => {
+    if (allText.includes(keyword)) matchCounts.date++;
+  });
+
+  Object.entries(keywordMap.creditCard).forEach(([type, keywords]) => {
+    keywords.forEach(keyword => {
+      if (allText.includes(keyword)) matchCounts[type]++;
+    });
+  });
+
+  // Determine the most matched type
+  const sortedMatches = Object.entries(matchCounts).sort((a, b) => b[1] - a[1]);
+  const [bestMatch, count] = sortedMatches[0];
+
+  if (count === 0) return;
+
+  const countryRules = validationRules[selectedCountry];
+
+  let selectedRegex = '';
+  let selectedMask = '';
+
+  if (['visa', 'mastercard', 'amex'].includes(bestMatch)) {
+    selectedRegex = countryRules.creditCard?.[bestMatch]?.regex;
+    selectedMask = countryRules.creditCard?.[bestMatch]?.mask;
+  } else {
+    selectedRegex = countryRules?.[bestMatch]?.regex;
+    selectedMask = countryRules?.[bestMatch]?.mask;
+  }
+
+  if (selectedRegex && selectedMask) {
+    setRegexInput(selectedRegex);
+    setInputMaskPattern(selectedMask);
+  }
+}
+
+
+
 const handleIdChange = (e) => {
   const value = e.target.value;
   setIdInput(value);
@@ -823,6 +1084,12 @@ const handleIdChange = (e) => {
     return hints.length ? hints.join('\n') : '';
   };
   const handleJsonInput = (field, value) => {
+    if(field === 'placeholder') setPlaceholderText(value);
+      else if(field === 'infoHint') setInfoHintText(value);
+      else if(field === 'constraintHint') setConstraintHintText(value);
+      else if(field === 'description') setDescriptionText(value);
+      else if(field === 'displayInfoHint') setDisplayInfoHintText(value);
+      else if(field === 'labelText') setLabelTextText(value);  
     try {
       const parsed = JSON.parse(value);
       if (typeof parsed === 'object' && parsed !== null) {
@@ -1002,6 +1269,12 @@ const applyInputMask = (value, mask) => {
       setIdInput(selected.id);
       setRegexInput(selected.regex);
       setFieldData(selected.fieldData);
+      setPlaceholderText(JSON.stringify(selected.fieldData['placeholder'], null, 2));
+      setInfoHintText(JSON.stringify(selected.fieldData['infoHint'], null, 2));
+      setConstraintHintText(JSON.stringify(selected.fieldData['constraintHint'], null, 2));
+      setDescriptionText(JSON.stringify(selected.fieldData['description'], null, 2));
+      setDisplayInfoHintText(JSON.stringify(selected.fieldData['displayInfoHint'], null, 2));
+      setLabelTextText(JSON.stringify(selected.fieldData['labelText'], null, 2));  
       setMyIcon(selected.icon);
       setAiDescription(selected.aiDescription);
       setIsRequired(selected.fieldRequired);
@@ -1101,7 +1374,7 @@ onClick={() => {
 <br />
 
   <label>Label Text JSON</label>
-  <textarea   value={JSON.stringify(fieldData['labelText'])}  tabIndex={2}
+  <textarea   value={labelTextText}  tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('labelText', e.target.value)} />
 
@@ -1132,7 +1405,7 @@ onClick={() => {
 <label style={{ marginTop: '10px', display: 'block' }}>
     {(t.descriptionLabel || 'Description') + ' JSON'}
   </label>
-  <textarea   value={JSON.stringify(fieldData['description'])}  tabIndex={2}
+  <textarea   value={descriptionText}  tabIndex={2}
   rows={4}
   placeholder={t.enterDescription || 'Enter description (shown in preview)'}
   style={styles.textarea} onChange={(e) => handleJsonInput('description', e.target.value)} />
@@ -1225,17 +1498,17 @@ onClick={() => {
 <br />
 
 <label>Placeholder JSON</label>
-  <textarea value={JSON.stringify(fieldData['placeholder'])}     tabIndex={2}
+  <textarea value={placeholderText}     tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('placeholder', e.target.value)} />
 
 <label>Input Info Hint JSON</label>
-  <textarea value={JSON.stringify(fieldData['infoHint'])}     tabIndex={2}
+  <textarea value={infoHintText}     tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('infoHint', e.target.value)} />
 
 <label>Constraint Hint JSON</label>
-  <textarea  value={JSON.stringify(fieldData['constraintHint'])}   tabIndex={2}
+  <textarea  value={constraintHintText}   tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('constraintHint', e.target.value)} />
 
@@ -1279,15 +1552,25 @@ onClick={() => {
   {isLocalizedEnabled && (
     <select
       value={selectedCountry}
-      onChange={(e) => setSelectedCountry(e.target.value)}
+      onChange={(e) => {
+        setSelectedCountry(e.target.value)
+        getMatchedFieldType(
+          fieldData,
+          selectedPreviewLang,
+          e.target.value,
+          cardLocalizationData,
+          setRegexInput,
+          setInputMaskPattern
+        );
+      }}
       style={styles.input}
     >
       <option value="">{language === 'ar' ? '- اختر دولة -' : '- Select Country -'}</option>
-      <option value="us">United States</option>
-      <option value="uk">United Kingdom</option>
-      <option value="de">Germany</option>
-      <option value="fr">France</option>
-      <option value="eg">Egypt</option>
+      <option value="US">United States</option>
+      <option value="UK">United Kingdom</option>
+      <option value="DE">Germany</option>
+      <option value="FR">France</option>
+      <option value="EG">Egypt</option>
       {/* Add more countries as needed */}
     </select>
   )}
@@ -1447,7 +1730,7 @@ onClick={() => {
       )}
   
 <label>Display Info Hint JSON</label>
-  <textarea  value={JSON.stringify(fieldData['displayInfoHint'])}   tabIndex={2}
+  <textarea  value={displayInfoHintText}   tabIndex={2}
   rows={4}
   style={styles.textarea} onChange={(e) => handleJsonInput('displayInfoHint', e.target.value)} />
 
