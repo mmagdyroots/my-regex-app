@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/my-regex-app/static/css/main.e6c13ad2.css",
-    "main.js": "/my-regex-app/static/js/main.f082611f.js",
+    "main.js": "/my-regex-app/static/js/main.a2570afc.js",
     "index.html": "/my-regex-app/index.html",
     "main.e6c13ad2.css.map": "/my-regex-app/static/css/main.e6c13ad2.css.map",
-    "main.f082611f.js.map": "/my-regex-app/static/js/main.f082611f.js.map"
+    "main.a2570afc.js.map": "/my-regex-app/static/js/main.a2570afc.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.f082611f.js"
+    "static/js/main.a2570afc.js"
   ]
 }
