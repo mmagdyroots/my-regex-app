@@ -560,7 +560,7 @@ const jsonExamples = {
   }
 };
 
-const DemoAppUnits = () => {
+const DemoAppTrRole = () => {
   const [language, setLanguage] = useState('en');
   let t = translations[language];
   const [regexInput, setRegexInput] = useState('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
@@ -593,7 +593,10 @@ const [inputDataType, setInputDataType] = useState('text'); // Default type is '
 const [crossFieldValidation, setCrossFieldValidation] = useState(''); // Default type is 'text'
 const [backendValidation, setBackendValidation] = useState(''); // Default type is 'text'
 const [specialValidation, setSpecialValidation] = useState(''); // Default type is 'text'
-
+  const [translatedText, setTranslatedText] = useState("");
+  const [translationRole, setTranslationRole] = useState("meaning");
+  const [roleLanguage, setRoleLanguage] = useState("en");
+  const [isTrRoleEnabled, setIsTrRoleEnabled] = useState(false);
 
 
 const [fieldData, setFieldData] = useState({
@@ -622,11 +625,6 @@ const [labelTextText, setLabelTextText] = useState(JSON.stringify(fieldData['lab
   const [customPattern, setCustomPattern] = useState('');
   const [customReplacement, setCustomReplacement] = useState('');
 
-const [isMeasurementUnitEnabled , setIsMeasurementUnitEnabled ] = useState(false);
-const [selectedMeasurementUnit, setSelectedMeasurementUnit] = useState('');
-const [selectedDisplayUnit, setSelectedDisplayUnit] = useState('');
-const [convertedValue, setConvertedValue] = useState('');
-
 
   const actions = [
     { type: 'email', label: language === 'ar' ? 'إرسال بريد' : 'Email' },
@@ -640,41 +638,7 @@ const [convertedValue, setConvertedValue] = useState('');
     { type: 'instagram', label: language === 'ar' ? 'افتح انستجرام' : 'Open Instagram' },
     { type: 'facebook', label: language === 'ar' ? 'افتح فيسبوك' : 'Open Facebook' }
   ];
-const unitCategories = {
-  Length: ['Meter', 'Kilometer', 'Centimeter', 'Inch', 'Foot', 'Mile'],
-  Weight: ['Gram', 'Kilogram', 'Pound', 'Ounce', 'Ton'],
-  Temperature: ['Celsius', 'Fahrenheit', 'Kelvin'],
-  Volume: ['Liter', 'Milliliter', 'Gallon', 'Cubic meter'],
-  Time: ['Second', 'Minute', 'Hour', 'Day'],
-};
-const unitSymbols = {
-  Meter: { symbol: 'm', name: 'Meter' },
-  Kilometer: { symbol: 'km', name: 'Kilometer' },
-  Centimeter: { symbol: 'cm', name: 'Centimeter' },
-  Inch: { symbol: 'in', name: 'Inch' },
-  Foot: { symbol: 'ft', name: 'Foot' },
-  Mile: { symbol: 'mi', name: 'Mile' },
 
-  Gram: { symbol: 'g', name: 'Gram' },
-  Kilogram: { symbol: 'kg', name: 'Kilogram' },
-  Pound: { symbol: 'lb', name: 'Pound' },
-  Ounce: { symbol: 'oz', name: 'Ounce' },
-  Ton: { symbol: 't', name: 'Ton' },
-
-  Celsius: { symbol: '°C', name: 'Celsius' },
-  Fahrenheit: { symbol: '°F', name: 'Fahrenheit' },
-  Kelvin: { symbol: 'K', name: 'Kelvin' },
-
-  Liter: { symbol: 'L', name: 'Liter' },
-  Milliliter: { symbol: 'mL', name: 'Milliliter' },
-  Gallon: { symbol: 'gal', name: 'Gallon' },
-  'Cubic meter': { symbol: 'm³', name: 'Cubic meter' },
-
-  Second: { symbol: 's', name: 'Second' },
-  Minute: { symbol: 'min', name: 'Minute' },
-  Hour: { symbol: 'h', name: 'Hour' },
-  Day: { symbol: 'd', name: 'Day' },
-};
 const handleAction = () => {
     let url = '';
     switch (selectedAction) {
@@ -736,31 +700,36 @@ const handleAction = () => {
     }
   };
 
-function convertValue(value, fromUnit, toUnit) {
-  if (fromUnit === toUnit) return value;
+  const roles = [
+    { value: "meaning", label: "Meaning (word-by-word)" },
+    { value: "context", label: "Context (expression)" },
+    { value: "pronouns", label: "Pronunciation-based" },
+  ];
 
-  const tempMap = {
-    Celsius: {
-      Fahrenheit: (c) => (c * 9) / 5 + 32,
-      Kelvin: (c) => c + 273.15,
-    },
-    Fahrenheit: {
-      Celsius: (f) => ((f - 32) * 5) / 9,
-      Kelvin: (f) => ((f - 32) * 5) / 9 + 273.15,
-    },
-    Kelvin: {
-      Celsius: (k) => k - 273.15,
-      Fahrenheit: (k) => ((k - 273.15) * 9) / 5 + 32,
-    },
-    // Add other unit types here as needed
+  const handleTranslate = () => {
+    let result = "";
+
+    if (!inputValue.trim()) {
+      setTranslatedText("Please enter some text.");
+      return;
+    }
+    // using apis
+    switch (translationRole) {
+      case "meaning":
+        result = `Translating "${inputValue}" to ${selectedPreviewLang} by meaning (word-by-word)...`;
+        break;
+      case "context":
+        result = `Translating "${inputValue}" to ${selectedPreviewLang} by context (expression)...`;
+        break;
+      case "pronouns":
+        result = `Converting "${inputValue}" to ${selectedPreviewLang} by pronunciation...`;
+        break;
+      default:
+        result = "Invalid translation role selected.";
+    }
+
+    setTranslatedText(result);
   };
-
-  if (tempMap[fromUnit] && tempMap[fromUnit][toUnit]) {
-    return tempMap[fromUnit][toUnit](value).toFixed(2);
-  }
-
-  return 'Conversion not supported';
-}
 
 const handleIdChange = (e) => {
   const value = e.target.value;
@@ -1240,12 +1209,7 @@ onClick={() => {
         placeholder={t.enterRegex}
       />
 
-
-
-
-
-
-      <label>
+       <label>
       <input
         type="checkbox"
         checked={isRequired}
@@ -1340,47 +1304,6 @@ onClick={() => {
   rows={1}
   style={styles.textarea} />
 
-
-{/* Measuring Units Checkbox and Dropdown */}
-<div style={{ marginTop: '10px' }}>
-  <label>
-    <input
-      type="checkbox"
-      checked={isMeasurementUnitEnabled}
-       onChange={(e) => {
-        setIsMeasurementUnitEnabled(e.target.checked);
-      }}
-      style={{ marginRight: 8 }}
-    />
-    {language === 'ar' ? 'الوحدات' : 'Measuring Units'}
-  </label>
-
-  {isMeasurementUnitEnabled && (
-    <select
-      value={selectedMeasurementUnit}
-      onChange={(e) => setSelectedMeasurementUnit(e.target.value)}
-      style={{ ...styles.input, marginTop: '10px' }}
-    >
-      <option value="">{language === 'ar' ? '- اختر وحدة -' : '- Select Unit -'}</option>
-      {Object.entries(unitCategories).map(([category, units]) => (
-        <optgroup key={category} label={category}>
-          {units.map((unit) => (
-            <option key={unit} value={unit} title={unitSymbols[unit]?.name || unit}>
-              {unitSymbols[unit]?.symbol || unit}
-            </option>
-          ))}
-        </optgroup>
-      ))}
-    </select>
-  )}
-</div>
-
-
-
-
-
-
-
     <h2>{t.previewTitle}</h2>
 
 
@@ -1452,6 +1375,35 @@ onClick={() => {
         />
       )}
       <br />
+
+       <label>
+  <input
+    type="checkbox"
+    checked={isTrRoleEnabled}
+    onChange={(e) => setIsTrRoleEnabled(e.target.checked)}
+    style={{ marginRight: 8 }}
+  />
+  Translation Role Enable
+</label>
+      {/* Translation Role */}
+      {isTrRoleEnabled && (
+      <div className="flex items-center gap-2">
+        <label className="w-20">Role:</label>
+        <select
+              style={styles.input}
+          className="border p-2 rounded"
+          value={translationRole}
+          onChange={(e) => setTranslationRole(e.target.value)}
+        >
+          {roles.map((role) => (
+            <option key={role.value} value={role.value}>
+              {role.label}
+            </option>
+          ))}
+        </select>
+      </div>)}
+<br />
+<br />
       {/* Format Selector */}
       <div style={{ marginBottom: '10px' }}>
         <label htmlFor="formatSelector">Display Format:</label>
@@ -1564,15 +1516,6 @@ onClick={() => {
       const masked = isInputMaskEnabled ? applyInputMask(val, inputMaskPattern) : val;
       setInputValue(masked);
       validateInput(masked);
-          if (masked && selectedMeasurementUnit && selectedDisplayUnit) {
-      setConvertedValue(
-        convertValue(
-          parseFloat(masked),
-          selectedMeasurementUnit,
-          selectedDisplayUnit
-        )
-      );
-    }
     }}
     onPaste={pasteGuard ? (e) => e.preventDefault() : undefined}
     // onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
@@ -1588,22 +1531,7 @@ onClick={() => {
 <InfoTooltip
   tooltipText={[...getCustomConstraints(), ...parseConstraints(regexInput)].join('\n')}
 />
-  {isMeasurementUnitEnabled && selectedMeasurementUnit && (
-    <span
-      title={unitSymbols[selectedMeasurementUnit]?.name || selectedMeasurementUnit}
-    style={{
-      position: 'absolute',
-      right: '70px',
-      top: '50%',
-      transform: 'translateY(-50%)',
-          pointerEvents: 'auto', // allow hover
-        zIndex: 2, // raise above input
-      color: '#888',
-    }}>
-      ({unitSymbols[selectedMeasurementUnit]?.symbol || selectedMeasurementUnit})
 
-    </span>
-  )}
 </div>
 
   
@@ -1655,39 +1583,9 @@ onClick={() => {
 
 
 
-      {/* Output Unit Dropdown */}
-      {selectedMeasurementUnit && (
-        <select
-          value={selectedDisplayUnit}
-          onChange={(e) => {
-            const val = e.target.value;
-            setSelectedDisplayUnit(val);
-            if (inputValue && val) {
-              setConvertedValue(
-                convertValue(
-                  parseFloat(inputValue),
-                  selectedMeasurementUnit,
-                  val
-                )
-              );
-            }
-          }}
-          style={{ ...styles.input, marginTop: '10px' }}
-        >
-          <option value="">{language === 'ar' ? '- اختر وحدة العرض -' : '- Select Display Unit -'}</option>
-          {Object.entries(unitCategories).map(([category, units]) =>
-            units.includes(selectedMeasurementUnit)
-              ? units.map((unit) => (
-                  <option key={unit} value={unit} title={unitSymbols[unit]?.name || unit}>
-                    {unitSymbols[unit]?.symbol || unit}
-                  </option>
-                ))
-              : null
-          )}
-        </select>
-      )}
-
+      
 <div style={{ position: 'relative', width: '100%' }}>
+
 
 {hyperLinkEnabled ? (
         <a
@@ -1706,13 +1604,13 @@ onClick={() => {
             cursor: 'pointer'
           }}
         >
-          {formatValue(convertedValue)}
+          {isTrRoleEnabled && translationRole? formatValue(translatedText): formatValue(inputValue)}
         </a>
       ) : (
         <input
           tabIndex={1}
           placeholder={fieldData.placeholder[selectedPreviewLang] || ''}
-          value={formatValue(convertedValue)}
+          value={isTrRoleEnabled && translationRole? formatValue(translatedText): formatValue(inputValue)}
           readOnly={true}
           onCopy={copyGuard ? (e) => e.preventDefault() : undefined}
           style={{
@@ -1732,7 +1630,7 @@ onClick={() => {
       <button
       onClick={async () => {
         try {
-          await navigator.clipboard.writeText(inputValue);
+          await navigator.clipboard.writeText(isTrRoleEnabled && translationRole? formatValue(translatedText): formatValue(inputValue));
         } catch (err) {
           console.error('Failed to copy: ', err);
         }
@@ -1765,23 +1663,14 @@ onClick={() => {
           {actions.find(a => a.type === selectedAction)?.label}
         </button>
       )}
-
-  {isMeasurementUnitEnabled && selectedDisplayUnit && (
-    <span
-    title={unitSymbols[selectedDisplayUnit]?.name || selectedDisplayUnit}
-    style={{
-      position: 'absolute',
-      right: '70px',
-      top: '50%',
-      transform: 'translateY(-50%)',
-          pointerEvents: 'auto', // allow hover
-    zIndex: 2, // raise above input
-      color: '#888',
-    }}>
-      {(isMeasurementUnitEnabled && unitSymbols[selectedDisplayUnit]?.symbol || selectedDisplayUnit)}
-    </span>
-  )}
 </div>
+      {/* Translate Button */}
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded"
+        onClick={handleTranslate}
+      >
+        Translate
+      </button>
 
       </div>
 
@@ -1879,4 +1768,4 @@ const styles = {
   },
 };
 
-export default DemoAppUnits;
+export default DemoAppTrRole;

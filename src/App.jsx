@@ -5,6 +5,7 @@ import FullApp from "./components/FullApp/FullApp.jsx";
 import DemoApp from "./components/DemoApp/DemoApp.jsx";
 import DemoAppLocalization from "./components/DemoAppLocalization/DemoAppLocalization.jsx";
 import DemoAppUnits from "./components/DemoAppUnits/DemoAppUnits.jsx";
+import DemoAppTrRole from "./components/DemoAppTrRole/DemoAppTrRole.jsx";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/fullApp" element={<FullApp />} />
           <Route path="/demoAppLocalization" element={<DemoAppLocalization />} />
           <Route path="/demoAppUnits" element={<DemoAppUnits />} />
+          <Route path="/demoAppTrRole" element={<DemoAppTrRole />} />
         </Route>
       </Routes>
     </HashRouter >

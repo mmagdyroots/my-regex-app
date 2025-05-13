@@ -93,6 +93,11 @@ function Navbar() {
                   <Typography sx={{ textAlign: 'center' }}>Units</Typography>
                 </MenuItem>
                   </Link>
+                <Link style={{ textDecoration: 'none',color:'rgba(0,0,0,.87)',marginTop:'3px',display:'block'}} to="demoAppTrRole">
+                <MenuItem onClick={handleCloseNavMenu} sx={{justifyContent: 'center'}}>
+                  <Typography sx={{ textAlign: 'center' }}>Translation Role</Typography>
+                </MenuItem>
+                  </Link>
                 
             </Menu>
           </Box>
@@ -145,6 +150,14 @@ function Navbar() {
                 sx={{ my: 2, color: 'white',background:'#008CBA', display: 'block' }}
               >
                 Units
+              </Button>
+              </Link>
+              <Link style={{ textDecoration: 'none',marginLeft:'12px'}} to="demoAppTrRole">
+              <Button
+                  variant="contained"
+                sx={{ my: 2, color: 'white',background:'#008CBA', display: 'block' }}
+              >
+                Translation Role
               </Button>
               </Link>
           </Box>
